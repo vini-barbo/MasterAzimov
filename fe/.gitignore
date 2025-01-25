@@ -7,12 +7,9 @@
 /bazel-out
 
 # Node
-fe/node_modules
-fe/npm-debug.log
-fe/yarn-error.log
-de/node_modules
-de/npm-debug.log
-de/yarn-error.log
+/node_modules
+npm-debug.log
+yarn-error.log
 
 # IDEs and editors
 .idea/
