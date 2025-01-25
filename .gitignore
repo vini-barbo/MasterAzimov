@@ -14,6 +14,13 @@ de/node_modules
 de/npm-debug.log
 de/yarn-error.log
 
+#FE
+fe/.angular
+fe/npm-debug.log
+fe/yarn-error.log
+
+#BE
+
 # IDEs and editors
 .idea/
 .project
