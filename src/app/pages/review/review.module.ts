@@ -3,9 +3,12 @@ import { CommonModule } from '@angular/common';
 
 import { ReviewRoutingModule } from './review-routing.module';
 import { PhaseOneComponent } from './phase-one/phase-one.component';
+import { PhaseTwoComponent } from './phase-two/phase-two.component';
 
 @NgModule({
-    declarations: [],
+    declarations: [
+    PhaseTwoComponent
+  ],
     imports: [CommonModule, ReviewRoutingModule]
 })
 export class ReviewModule {}

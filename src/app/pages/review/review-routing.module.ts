@@ -4,7 +4,10 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
     {
         path: '',
-        children: [{ path: '', loadComponent: () => import('./phase-one/phase-one.component').then((c) => c.PhaseOneComponent) }]
+        children: [
+            { path: 'phaseone', loadComponent: () => import('./phase-one/phase-one.component').then((c) => c.PhaseOneComponent) },
+            { path: 'phasetwo', loadComponent: () => import('./phase-two/phase-two.component').then((c) => c.PhaseTwoComponent) }
+        ]
     }
 ];
 

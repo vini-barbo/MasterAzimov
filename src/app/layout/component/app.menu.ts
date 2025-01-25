@@ -25,6 +25,13 @@ export class AppMenu {
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
             {
+                label: 'Review',
+                items: [
+                    { label: 'Identification', icon: 'pi pi-fw pi-paper', routerLink: ['/review/phase-one'] },
+                    { label: 'Search', icon: 'pi pi-fw pi-paper', routerLink: ['/review/phase-two'] }
+                ]
+            },
+            {
                 label: 'UI Components',
                 items: [
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },
