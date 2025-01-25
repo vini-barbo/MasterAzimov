@@ -20,6 +20,8 @@ fe/npm-debug.log
 fe/yarn-error.log
 
 #BE
+/be/dist
+be/dist
 
 # IDEs and editors
 .idea/
@@ -32,10 +34,6 @@ fe/yarn-error.log
 
 # Visual Studio Code
 
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 .history/*
 
 # Miscellaneous
