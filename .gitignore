@@ -10,9 +10,9 @@
 fe/node_modules
 fe/npm-debug.log
 fe/yarn-error.log
-de/node_modules
-de/npm-debug.log
-de/yarn-error.log
+be/node_modules
+be/npm-debug.log
+be/yarn-error.log
 
 #FE
 fe/.angular
