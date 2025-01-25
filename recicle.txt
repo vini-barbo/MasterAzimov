@@ -1,0 +1,11 @@
+  be:
+    build:
+      context: ./be
+      dockerfile: ${DOCKERFILE_BE}
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./be:/usr/src/app
+      - /usr/src/app/node_modules
+    stdin_open: true
+    tty: true
