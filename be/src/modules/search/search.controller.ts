@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { PubmedService } from 'src/api/pubmed/pubmed.service';
 import { SearchService } from './search.service';
 
@@ -12,8 +12,8 @@ export class SearchController {
         return this.searchService.getQTDArticles().then(a => Number(a.esearchresult.count)) as Promise<number>
     }
 
-    @Get('ids')
-    findIDArticles(): Promise<string[]> {
+    @Get('ids/:qtd')
+    findIDArticles(@Param('id') id: number): Promise<string[]> {
         return this.searchService.getQTDArticles().then(a => Number(a.esearchresult.idlist)) as Promise<string[]>
     }
 
