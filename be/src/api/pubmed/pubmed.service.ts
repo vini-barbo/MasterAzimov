@@ -11,15 +11,27 @@ export class PubmedService {
     params = {
         db: "pubmed",
         retmode: "json",
-        retmax: 20,
-        key: process.env.PUBMED_API_KEY as string
+        key: process.env.PUBMED_API_KEY
     };
 
-    async fetchArticles(query: string): Promise<IEsearch> {
+    async fetchArticles(query: string, qtd: number = 20): Promise<IEsearch> {
+        try {
+            const response = await lastValueFrom(
+                this.httpService.get(this.url, { params: { term: query, retmax: qtd, ...this.params } })
+            );
+            return response.data as IEsearch;
+        } catch (error) {
+            throw new Error(`Failed to fetch articles: ${error.message}`);
+        }
+    }
+
+    async getSummaryArticles(query: string, qtd: number = 20): Promise<IEsearch> {
+
+        const ids = (await this.fetchArticles(query, qtd)).esearchresult.idlist
 
         try {
             const response = await lastValueFrom(
-                this.httpService.get(this.url, { params: { term: query, ...this.params } })
+                this.httpService.get(this.url + ids.join(','))
             );
             return response.data as IEsearch;
         } catch (error) {

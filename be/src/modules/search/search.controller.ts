@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { PubmedService } from 'src/api/pubmed/pubmed.service';
 import { SearchService } from './search.service';
 
@@ -8,13 +8,19 @@ export class SearchController {
     constructor(private readonly searchService: SearchService) { }
 
     @Get('qtd')
-    findQTDArticles(): Promise<number> {
-        return this.searchService.getQTDArticles().then(a => Number(a.esearchresult.count)) as Promise<number>
+    findQTDArticles(@Query('query') query: string): Promise<number> {
+        return this.searchService.getQTDArticles(query)
     }
 
-    @Get('ids/:qtd')
-    findIDArticles(@Param('id') id: number): Promise<string[]> {
-        return this.searchService.getQTDArticles().then(a => Number(a.esearchresult.idlist)) as Promise<string[]>
+    @Get('ids')
+    findIDArticles(
+        @Query('query') query: string,
+        @Query('qtd', ParseIntPipe) qtd: number
+    ): Promise<string[]> {
+        return this.searchService
+            .getArticlesIDs(query, qtd);
     }
+
+    findArticleSummary() { }
 
 }
