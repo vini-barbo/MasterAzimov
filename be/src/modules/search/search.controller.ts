@@ -1,5 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { PubmedService } from 'src/api/pubmed/pubmed.service';
+import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { SearchService } from './search.service';
 
 @Controller('search')
@@ -21,6 +20,12 @@ export class SearchController {
             .getArticlesIDs(query, qtd);
     }
 
-    findArticleSummary() { }
-
+    @Get('summary')
+    findArticleSummary(
+        @Query('query') query: string,
+        @Query('qtd', ParseIntPipe) qtd: number,
+    ): any {
+        console.log('cu')
+        return 'this.searchService.getArticleSummary(query, qtd)';
+    }
 }
