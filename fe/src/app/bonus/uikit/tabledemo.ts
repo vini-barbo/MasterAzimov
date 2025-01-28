@@ -439,7 +439,7 @@ export class TableDemo implements OnInit {
     constructor(
         private customerService: CustomerService,
         private productService: ProductService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.customerService.getCustomersLarge().then((customers) => {
