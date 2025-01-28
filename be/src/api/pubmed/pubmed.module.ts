@@ -5,6 +5,6 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   providers: [PubmedService],
   imports: [HttpModule],
-  exports: [PubmedService]
+  exports: [PubmedService],
 })
 export class PubmedModule { }

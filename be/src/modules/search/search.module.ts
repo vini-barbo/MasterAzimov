@@ -7,6 +7,6 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   controllers: [SearchController],
   providers: [SearchService],
-  imports: [PubmedModule, HttpModule]
+  imports: [PubmedModule, HttpModule],
 })
 export class SearchModule { }
