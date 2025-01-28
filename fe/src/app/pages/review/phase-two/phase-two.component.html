@@ -19,12 +19,25 @@
             </div>
         </form>
     </p-fluid>
-
     <p-fluid class="grid md:flex-row gap-8">
         <div class="card grid gap-4">
-            <h3>Result:</h3>
-            <div>
-                <p>{{ submittedData}}</p>
+            <div class="font-semibold text-xl">Results</div>
+            <div class="flex flex-wrap gap-6">
+                <h3>Results:</h3>
+                <div class="grid gap-4">
+                    <div class="font-semibold text-lg">Title</div>
+                    <div>{{ formData }}</div>
+                    <div class="font-semibold text-lg">Authors</div>
+                    <div>{{ formData }}</div>
+                    <div class="font-semibold text-lg">Abstract</div>
+                    <div>{{ formData }}</div>
+                    <div class="font-semibold text-lg">Keywords</div>
+                    <div>{{ formData }}</div>
+                    <div class="font-semibold text-lg">URL</div>
+                    <div>{{ formData}}</div>
+                </div>
+                <app-article-table></app-article-table>
+                TESTE
             </div>
         </div>
     </p-fluid>

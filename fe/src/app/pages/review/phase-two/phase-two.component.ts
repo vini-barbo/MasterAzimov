@@ -6,13 +6,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ArticlesService } from '../../../api/articles.service';
-import { ApiModule } from '../../../api/api.module';
+import { ArticleTable } from "./articles-table.component";
 
 @Component({
     selector: 'app-phase-two',
     templateUrl: './phase-two.component.html',
-    styleUrls: ['./phase-two.component.scss'],
-    imports: [InputTextModule, FluidModule, ButtonModule, SelectModule, FormsModule, TextareaModule, ApiModule],
+    providers: [ArticlesService],
+    imports: [InputTextModule, FluidModule, ButtonModule,
+        SelectModule, FormsModule, TextareaModule, ArticleTable],
 })
 export class PhaseTwoComponent implements OnInit {
     constructor(private readonly articleService: ArticlesService) { }
@@ -30,6 +31,7 @@ export class PhaseTwoComponent implements OnInit {
             },
         });
     }
+
 
     ngOnInit(): void { }
 }

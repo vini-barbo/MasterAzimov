@@ -1,9 +1,3 @@
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DatePickerModule } from 'primeng/datepicker';
-import { AutoCompleteModule } from 'primeng/autocomplete';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputIcon } from 'primeng/inputicon';
-import { IconField } from 'primeng/iconfield';
 import { FluidModule } from 'primeng/fluid';
 import { Component, OnInit } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,11 +8,12 @@ import { TextareaModule } from 'primeng/textarea';
 
 @Component({
     selector: 'app-phase-one',
-    imports: [InputTextModule, FluidModule, ButtonModule, SelectModule, FormsModule, TextareaModule],
+    imports: [InputTextModule, FluidModule, ButtonModule,
+        SelectModule, FormsModule, TextareaModule],
     templateUrl: './phase-one.component.html'
 })
 export class PhaseOneComponent implements OnInit {
-    constructor() {}
+    constructor() { }
 
     dropdownItems = [
         { name: 'Review', code: 'Review' },
@@ -28,5 +23,5 @@ export class PhaseOneComponent implements OnInit {
 
     dropdownItem = null;
 
-    ngOnInit(): void {}
+    ngOnInit(): void { }
 }
