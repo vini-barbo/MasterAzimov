@@ -25,7 +25,6 @@ export class SearchController {
         @Query('query') query: string,
         @Query('qtd', ParseIntPipe) qtd: number,
     ): any {
-        console.log('cu')
-        return 'this.searchService.getArticleSummary(query, qtd)';
+        return this.searchService.getArticleSummary(query, qtd);
     }
 }

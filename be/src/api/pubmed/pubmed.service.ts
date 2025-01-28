@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { IEsearch } from './types/IEsearch';
-import { IEsummary } from './types/IEsummary';
+import { IEsummary, IEsummaryResultItem } from './types/IEsummary';
 
 @Injectable()
 export class PubmedService {
@@ -27,27 +27,35 @@ export class PubmedService {
         }
     }
 
-    async fetchSummaryArticles(query: string, qtd: number = 20): Promise<IEsummary> {
-
-        const ids = (await this.fetchArticlesMeta(query, qtd)).esearchresult.idlist
-
-        console.log('teste', ids)
+    async fetchSummaryArticles(query: string, qtd: number = 20): Promise<IEsummaryResultItem[]> {
         try {
+            const { esearchresult } = await this.fetchArticlesMeta(query, qtd);
+            const ids = esearchresult.idlist;
+
+            if (ids.length === 0) {
+                return [];
+            }
+
             const response = await lastValueFrom(
-                this.httpService.get(this.urlEsummary, { params: { term: query, ids: ids.join(','), ...this.params } })
-            ).then(a => a.data);
+                this.httpService.get<IEsummary>(this.urlEsummary, {
+                    params: {
+                        term: query,
+                        id: ids.join(','),
+                        ...this.params,
+                    },
+                })
+            );
 
-            const teste = response.data as IEsummary
+            const summaryData = response.data;
 
-            teste.result.uids.map(m => {
-                console.log(teste.result.m)
-            })
+            // Criação da lista de resultados
+            const summaryList = summaryData.result.uids.map((uid) => summaryData.result[uid]);
 
-            return response.data as IEsummary;
-
-
-        } catch (error) {
-            throw new Error(`Failed to fetch articles: ${error.message}`);
+            return summaryList as IEsummaryResultItem[];
+        } catch (error: any) {
+            console.error('Error fetching summary articles:', error);
+            throw new Error(`Failed to fetch articles: ${error.message || error}`);
         }
     }
+
 }

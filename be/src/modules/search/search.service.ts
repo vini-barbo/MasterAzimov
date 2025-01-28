@@ -5,8 +5,6 @@ import { PubmedService } from 'src/api/pubmed/pubmed.service';
 export class SearchService {
     constructor(private readonly pubmedService: PubmedService) { }
 
-
-
     async getQTDArticles(query: string): Promise<number> {
         return Number((await this.pubmedService.fetchArticlesMeta(query)).esearchresult.count)
     }
