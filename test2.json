@@ -1,0 +1,977 @@
+{
+    "PubmedArticleSet": {
+      "PubmedArticle": [
+        {
+          "MedlineCitation": {
+            "PMID": 39848964,
+            "DateCompleted": {
+              "Year": 2025,
+              "Month": 1,
+              "Day": 23
+            },
+            "DateRevised": {
+              "Year": 2025,
+              "Month": 1,
+              "Day": 26
+            },
+            "Article": {
+              "Journal": {
+                "ISSN": "2045-2322",
+                "JournalIssue": {
+                  "Volume": 15,
+                  "Issue": 1,
+                  "PubDate": {
+                    "Year": 2025,
+                    "Month": "Jan",
+                    "Day": 23
+                  }
+                },
+                "Title": "Scientific reports",
+                "ISOAbbreviation": "Sci Rep"
+              },
+              "ArticleTitle": "Identification of candidate genes involved in Zika virus-induced reversible paralysis of mice.",
+              "Pagination": {
+                "StartPage": 2926,
+                "MedlinePgn": 2926
+              },
+              "ELocationID": [
+                2926,
+                "10.1038/s41598-025-86475-0"
+              ],
+              "Abstract": {
+                "AbstractText": "Zika virus (ZIKV) causes a variety of peripheral and central nervous system complications leading to neurological symptoms such as limb weakness. We used a mouse model to identify candidate genes potentially involved in causation or recovery from ZIKV-induced acute flaccid paralysis. Using Zikv and Chat chromogenic and fluorescence in situ RNA hybridization, electron microscopy, immunohistochemistry, and ZIKV RT-qPCR, we determined that some paralyzed mice had infected motor neurons, but motor neurons are not reduced in number and the infection was not present in all paralyzed mice; hence infection of motor neurons were not strongly correlated with paralysis. Consequently, paralysis was probably caused by by-stander effects. To address this, we performed bioinformatics analysis on spinal cord RNA to identify 2058 differentially expressed genes (DEGs) that were altered during paralysis and then normalized after paralysis. Of these \"biphasic\" DEGs, 951 were up-regulated and 1107 were down-regulated during paralysis, followed by recovery. To refine the search for candidate DEGs we used gene ontology analysis and RT-qPCR to select 3 DEGs that could be involved with the node of Ranvier function and 5 DEGs that could be involved with synaptic function. Among these, SparcL1:Sparc DEG ratios were identified to be inversely correlated with ZIKV-induced paralysis, which is consistent with the known function of SPARC protein to antagonize the synaptogenesis of SPARCL1. Ank3, Sptbn1, and Epb41l3 affecting the structures at and near the nodes of Ranvier were significantly downregulated during ZIKV-induced paralysis. The primary contribution is the identification of 8 candidate genes that may be involved in the causation or recovery of ZIKV-induced paralysis.",
+                "CopyrightInformation": "&#xa9; 2025. The Author(s)."
+              },
+              "AuthorList": {
+                "Author": [
+                  {
+                    "LastName": "Morrey",
+                    "ForeName": "John D",
+                    "Initials": "JD",
+                    "AffiliationInfo": {
+                      "Affiliation": "Institute for Antiviral Research, Department of Animal, Dairy, and Veterinary Sciences, Utah State University, Logan, UT, 84321-5600, USA. John.morrey@usu.edu."
+                    }
+                  },
+                  {
+                    "LastName": "Siddharthan",
+                    "ForeName": "Venkatraman",
+                    "Initials": "V",
+                    "AffiliationInfo": {
+                      "Affiliation": "Institute for Antiviral Research, Department of Animal, Dairy, and Veterinary Sciences, Utah State University, Logan, UT, 84321-5600, USA."
+                    }
+                  },
+                  {
+                    "LastName": "Wang",
+                    "ForeName": "Hong",
+                    "Initials": "H",
+                    "AffiliationInfo": {
+                      "Affiliation": "Institute for Antiviral Research, Department of Animal, Dairy, and Veterinary Sciences, Utah State University, Logan, UT, 84321-5600, USA."
+                    }
+                  },
+                  {
+                    "LastName": "Oliveira",
+                    "ForeName": "Alexandre L R",
+                    "Initials": "ALR",
+                    "AffiliationInfo": {
+                      "Affiliation": "Institute of Biology, University of Campinas, Campinas, SP, Brazil."
+                    }
+                  },
+                  {
+                    "LastName": "Susuki",
+                    "ForeName": "Keiichiro",
+                    "Initials": "K",
+                    "AffiliationInfo": {
+                      "Affiliation": "Department of Neuroscience, Cell Biology and Physiology, Boonshoft School of Medicine, Wright State University, Dayton, OH, 45435-0001, USA."
+                    }
+                  },
+                  {
+                    "LastName": "Kaundal",
+                    "ForeName": "Rakesh",
+                    "Initials": "R",
+                    "AffiliationInfo": [
+                      {
+                        "Affiliation": "Bioinformatics Facility, Center for Integrated BioSystems, Department of Plants, Soils, and Climate, College of Agriculture and Applied Sciences, Logan, UT, 84322, USA."
+                      },
+                      {
+                        "Affiliation": "Department of Computer Science, College of Science, Logan, UT, 84322, USA."
+                      }
+                    ]
+                  },
+                  {
+                    "LastName": "Freeman",
+                    "ForeName": "Sara M",
+                    "Initials": "SM",
+                    "AffiliationInfo": {
+                      "Affiliation": "Department of Biology, Utah State University, Logan, UT, 84322, USA."
+                    }
+                  },
+                  {
+                    "LastName": "Thomas",
+                    "ForeName": "Aaron J",
+                    "Initials": "AJ",
+                    "AffiliationInfo": {
+                      "Affiliation": "Department of Animal, Dairy, and Veterinary Sciences, Utah State University, Logan, UT, 84322, USA."
+                    }
+                  },
+                  {
+                    "LastName": "Duhan",
+                    "ForeName": "Naveen",
+                    "Initials": "N",
+                    "AffiliationInfo": {
+                      "Affiliation": "Department of Plants, Soils, and Climate, College of Agriculture and Applied Sciences, Logan, UT, 84322, USA."
+                    }
+                  },
+                  {
+                    "LastName": "Corry",
+                    "ForeName": "Nathan G",
+                    "Initials": "NG",
+                    "AffiliationInfo": {
+                      "Affiliation": "Institute for Antiviral Research, Department of Animal, Dairy, and Veterinary Sciences, Utah State University, Logan, UT, 84321-5600, USA."
+                    }
+                  }
+                ]
+              },
+              "Language": "eng",
+              "GrantList": {
+                "Grant": [
+                  {
+                    "GrantID": "HHSN272201700041I",
+                    "Acronym": "AI",
+                    "Agency": "NIAID NIH HHS",
+                    "Country": "United States"
+                  },
+                  {
+                    "GrantID": "UAES #01455",
+                    "Agency": "Utah Agricultural Experiment Station",
+                    "Country": ""
+                  },
+                  {
+                    "GrantID": "HHSN272201700041I/HHSN27200004/A11",
+                    "Acronym": "NH",
+                    "Agency": "NIH HHS",
+                    "Country": "United States"
+                  }
+                ]
+              },
+              "PublicationTypeList": {
+                "PublicationType": "Journal Article"
+              },
+              "ArticleDate": {
+                "Year": 2025,
+                "Month": 1,
+                "Day": 23
+              }
+            },
+            "MedlineJournalInfo": {
+              "Country": "England",
+              "MedlineTA": "Sci Rep",
+              "NlmUniqueID": 101563288,
+              "ISSNLinking": "2045-2322"
+            },
+            "CitationSubset": "IM",
+            "MeshHeadingList": {
+              "MeshHeading": [
+                {
+                  "DescriptorName": "Animals"
+                },
+                {
+                  "DescriptorName": "Zika Virus Infection",
+                  "QualifierName": [
+                    "complications",
+                    "genetics",
+                    "virology",
+                    "pathology",
+                    "metabolism"
+                  ]
+                },
+                {
+                  "DescriptorName": "Zika Virus",
+                  "QualifierName": "genetics"
+                },
+                {
+                  "DescriptorName": "Mice"
+                },
+                {
+                  "DescriptorName": "Paralysis",
+                  "QualifierName": [
+                    "virology",
+                    "genetics",
+                    "pathology"
+                  ]
+                },
+                {
+                  "DescriptorName": "Disease Models, Animal"
+                },
+                {
+                  "DescriptorName": "Motor Neurons",
+                  "QualifierName": [
+                    "metabolism",
+                    "virology",
+                    "pathology"
+                  ]
+                },
+                {
+                  "DescriptorName": "Spinal Cord",
+                  "QualifierName": [
+                    "metabolism",
+                    "pathology",
+                    "virology"
+                  ]
+                },
+                {
+                  "DescriptorName": "Female"
+                },
+                {
+                  "DescriptorName": "Gene Expression Profiling"
+                },
+                {
+                  "DescriptorName": "Computational Biology",
+                  "QualifierName": "methods"
+                }
+              ]
+            },
+            "CoiStatement": "Declarations. Competing interests: The authors declare no competing interests."
+          },
+          "PubmedData": {
+            "History": {
+              "PubMedPubDate": [
+                {
+                  "Year": 2024,
+                  "Month": 8,
+                  "Day": 30
+                },
+                {
+                  "Year": 2025,
+                  "Month": 1,
+                  "Day": 10
+                },
+                {
+                  "Year": 2025,
+                  "Month": 1,
+                  "Day": 24,
+                  "Hour": 0,
+                  "Minute": 27
+                },
+                {
+                  "Year": 2025,
+                  "Month": 1,
+                  "Day": 24,
+                  "Hour": 0,
+                  "Minute": 26
+                },
+                {
+                  "Year": 2025,
+                  "Month": 1,
+                  "Day": 23,
+                  "Hour": 23,
+                  "Minute": 14
+                },
+                {
+                  "Year": 2025,
+                  "Month": 1,
+                  "Day": 23
+                }
+              ]
+            },
+            "PublicationStatus": "epublish",
+            "ArticleIdList": {
+              "ArticleId": [
+                39848964,
+                "PMC11757732",
+                "10.1038/s41598-025-86475-0",
+                "10.1038/s41598-025-86475-0"
+              ]
+            },
+            "ReferenceList": {
+              "Reference": [
+                {
+                  "Citation": "CDC concludes Zika causes microcephaly and other birth defects. (Centers for Disease Control and Prevention, 2016)."
+                },
+                {
+                  "Citation": "Counotte, M. J. et al. Zika virus infection as a cause of congenital brain abnormalities and Guillain-Barre syndrome: A living systematic review. Research8, 1433. 10.12688/f1000research.19918.1 (2019).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6852328",
+                      31754425
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Arias, A. et al. Guillain-Barre syndrome in patients with a recent history of Zika in Cucuta, Colombia: A descriptive case series of 19 patients from December 2015 to March 2016. J. Crit. Care37, 19&#x2013;23. 10.1016/j.jcrc.2016.08.016 (2016).",
+                  "ArticleIdList": {
+                    "ArticleId": 27610587
+                  }
+                },
+                {
+                  "Citation": "Cao-Lormeau, V. M. et al. Guillain-Barre Syndrome outbreak associated with Zika virus infection in French Polynesia: a case-control study. Lancet387, 1531&#x2013;1539. 10.1016/s0140-6736(16)00562-6 (2016).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC5444521",
+                      26948433
+                    ]
+                  }
+                },
+                {
+                  "Citation": "BritoF erreira, M. L. et al. Guillain-Barr&#xe9; syndrome, acute disseminated encephalomyelitis and encephalitis associated with Zika virus infection in Brazil: Detection of viral RNA and isolation of virus during late infection. Am. J. Trop. Med. Hyg.97, 1405&#x2013;1409. 10.4269/ajtmh.17-0106 (2017).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC5817749",
+                      29140242
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Mancera-P&#xe1;ez, O., Rom&#xe1;n, G. C., Pardo-Turriago, R., Rodr&#xed;guez, Y. &amp; Anaya, J. M. Concurrent Guillain-Barr&#xe9; syndrome, transverse myelitis and encephalitis post-Zika: A case report and review of the pathogenic role of multiple arboviral immunity. J. Neurol. Sci.395, 47&#x2013;53. 10.1016/j.jns.2018.09.028 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": 30292020
+                  }
+                },
+                {
+                  "Citation": "Krauer, F. et al. Zika virus infection as a cause of congenital brain abnormalities and Guillain-Barr&#xe9; syndrome: systematic review. PLoS Med.14, e1002203. 10.1371/journal.pmed.1002203 (2017).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC5207634",
+                      28045901
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Hughes, R. A. &amp; Cornblath, D. R. Guillain-Barre syndrome. Lancet366, 1653&#x2013;1666. 10.1016/s0140-6736(05)67665-9 (2005).",
+                  "ArticleIdList": {
+                    "ArticleId": 16271648
+                  }
+                },
+                {
+                  "Citation": "Sejvar, J. J., Baughman, A. L., Wise, M. &amp; Morgan, O. W. Population incidence of Guillain-Barre syndrome: a systematic review and meta-analysis. Neuroepidemiology36, 123&#x2013;133. 10.1159/000324710 (2011).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC5703046",
+                      21422765
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Esposito, S. &amp; Longo, M. R. Guillain-Barre syndrome. Autoimmunity Rev.16, 96&#x2013;101. 10.1016/j.autrev.2016.09.022 (2017).",
+                  "ArticleIdList": {
+                    "ArticleId": 27666816
+                  }
+                },
+                {
+                  "Citation": "Walteros, D. M. et al. Long-term outcomes of Guillain-Barr&#xe9; syndrome possibly associated with Zika virus infection. PLoS ONE14, e0220049. 10.1371/journal.pone.0220049 (2019).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6675241",
+                      31369576
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Morrey, J. D. et al. Zika virus infection causes temporary paralysis in adult mice with motor neuron synaptic retraction and evidence for proximal peripheral neuropathy. Sci. Rep.9, 19531. 10.1038/s41598-019-55717-3 (2019).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6925114",
+                      31862897
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Kuwabara, S. et al. Isolated absence of F waves and proximal axonal dysfunction in Guillain-Barr&#xe9; syndrome with antiganglioside antibodies. J. Neurol. Neurosurg. Psychiatry68, 191&#x2013;195. 10.1136/jnnp.68.2.191 (2000).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC1736791",
+                      10644786
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Susuki, K. et al. Anti-GM1 antibodies cause complement-mediated disruption of sodium channel clusters in peripheral motor nerve fibers. J. Neurosci.27, 3956&#x2013;3967. 10.1523/jneurosci.4401-06.2007 (2007).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6672537",
+                      17428969
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Hafer-Macko, C. et al. Acute motor axonal neuropathy: an antibody-mediated attack on axolemma. Ann. Neurol.40, 635&#x2013;644. 10.1002/ana.410400414 (1996).",
+                  "ArticleIdList": {
+                    "ArticleId": 8871584
+                  }
+                },
+                {
+                  "Citation": "Griffin, J. W. et al. Early nodal changes in the acute motor axonal neuropathy pattern of the Guillain-Barr&#xe9; syndrome. J. Neurocytol.25, 33&#x2013;51. 10.1007/bf02284784 (1996).",
+                  "ArticleIdList": {
+                    "ArticleId": 8852937
+                  }
+                },
+                {
+                  "Citation": "&#xd6;zyurt, M. G., Nascimento, F., Brownstone, R. M. &amp; Beato, M. On the origin of F-wave: involvement of central synaptic mechanisms. Brain147, 406&#x2013;413. 10.1093/brain/awad342 (2024).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC10834253",
+                      37796028
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Bessou, P., Emonet-D&#xe9;nand, F. &amp; Laporte, Y. Motor fibres innervating extrafusal and intrafusal muscle fibres in the cat. J. Physiol.180, 649&#x2013;672. 10.1113/jphysiol.1965.sp007722 (1965).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC1357408",
+                      4221243
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Cullheim, S. et al. Properties of motoneurons underlying their regenerative capacity after axon lesions in the ventral funiculus or at the surface of the spinal cord. Brain Res. Brain Res. Rev.40, 309&#x2013;316 (2002).",
+                  "ArticleIdList": {
+                    "ArticleId": 12589929
+                  }
+                },
+                {
+                  "Citation": "Lind&#xe5;, H. et al. Ultrastructural evidence for a preferential elimination of glutamate-immunoreactive synaptic terminals from spinal motoneurons after intramedullary axotomy. J. Compar. Neurol.425, 10&#x2013;23 (2000).",
+                  "ArticleIdList": {
+                    "ArticleId": 10940938
+                  }
+                },
+                {
+                  "Citation": "Marques, K. B., Santos, L. M. &amp; Oliveira, A. L. Spinal motoneuron synaptic plasticity during the course of an animal model of multiple sclerosis. Eur. J. Neurosci.24, 3053&#x2013;3062. 10.1111/j.1460-9568.2006.05184.x (2006).",
+                  "ArticleIdList": {
+                    "ArticleId": 17156366
+                  }
+                },
+                {
+                  "Citation": "Wu, D. &amp; Hersh, L. B. Choline acetyltransferase: celebrating its fiftieth year. J. Neurochem.62, 1653&#x2013;1663. 10.1046/j.1471-4159.1994.62051653.x (1994).",
+                  "ArticleIdList": {
+                    "ArticleId": 8158117
+                  }
+                },
+                {
+                  "Citation": "Gotts, J., Atkinson, L., Yanagawa, Y., Deuchars, J. &amp; Deuchars, S. A. Co-expression of GAD67 and choline acetyltransferase in neurons in the mouse spinal cord: A focus on lamina X. Brain Res.1646, 570&#x2013;579. 10.1016/j.brainres.2016.07.001 (2016).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC4986852",
+                      27378584
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Prasad, V. M. et al. Structure of the immature Zika virus at 9 &#xc5; resolution. Nat. Struct. Mol. Biol.24, 184&#x2013;186. 10.1038/nsmb.3352 (2017).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC5296287",
+                      28067914
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Liu, J. et al. A novel sheet-like virus particle array is a hallmark of Zika virus infection. Emerg. Microbes Infect.7, 69. 10.1038/s41426-018-0071-8 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC5915449",
+                      29691373
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Kordeli, E., Lambert, S., Bennett, V. &amp; Ankyrin, G. A new ankyrin gene with neural-specific isoforms localized at the axonal initial segment and node of Ranvier. J. Biol. Chem.270, 2352&#x2013;2359. 10.1074/jbc.270.5.2352 (1995).",
+                  "ArticleIdList": {
+                    "ArticleId": 7836469
+                  }
+                },
+                {
+                  "Citation": "Jenkins, S. M. &amp; Bennett, V. Ankyrin-G coordinates assembly of the spectrin-based membrane skeleton, voltage-gated sodium channels, and L1 CAMs at Purkinje neuron initial segments. J. Cell Biol.155, 739&#x2013;746. 10.1083/jcb.200109026 (2001).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC2150881",
+                      11724816
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Chang, K.-J. et al. Glial ankyrins facilitate paranodal axoglial junction assembly. Nat. Neurosci.17, 1673&#x2013;1681. 10.1038/nn.3858 (2014).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC4260775",
+                      25362471
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Hedstrom, K. L., Ogawa, Y. &amp; Rasband, M. N. AnkyrinG is required for maintenance of the axon initial segment and neuronal polarity. J. Cell Biol.183, 635&#x2013;640. 10.1083/jcb.200806112 (2008).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC2582894",
+                      19001126
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Boyle, M. E. et al. Contactin orchestrates assembly of the septate-like junctions at the paranode in myelinated peripheral nerve. Neuron30, 385&#x2013;397. 10.1016/s0896-6273(01)00296-3 (2001).",
+                  "ArticleIdList": {
+                    "ArticleId": 11395001
+                  }
+                },
+                {
+                  "Citation": "Bhat, M. A. et al. Axon-glia interactions and the domain organization of myelinated axons requires Neurexin IV/Caspr/Paranodin. Neuron30, 369&#x2013;383. 10.1016/S0896-6273(01)00294-X (2001).",
+                  "ArticleIdList": {
+                    "ArticleId": 11395000
+                  }
+                },
+                {
+                  "Citation": "Denisenko-Nehrbass, N. et al. Protein 4.1B associates with both Caspr/paranodin and Caspr2 at paranodes and juxtaparanodes of myelinated fibres. Eur. J. Neurosci.17, 411&#x2013;416. 10.1046/j.1460-9568.2003.02441.x (2003).",
+                  "ArticleIdList": {
+                    "ArticleId": 12542678
+                  }
+                },
+                {
+                  "Citation": "Ogawa, Y. et al. Spectrins and ankyrinB constitute a specialized paranodal cytoskeleton. J. Neurosci.26, 5230&#x2013;5239. 10.1523/jneurosci.0425-06.2006 (2006).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6674250",
+                      16687515
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Susuki, K. et al. Glial &#x3b2;II spectrin contributes to paranode formation and maintenance. J. Neurosci.38, 6063&#x2013;6075. 10.1523/jneurosci.3647-17.2018 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6031582",
+                      29853631
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Koopmans, F. et al. SynGO: an evidence-based, expert-curated knowledge base for the synapse. Neuron103, 217-234.e214. 10.1016/j.neuron.2019.05.002 (2019).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6764089",
+                      31171447
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Ramirez, J. J., Bindu, D. S. &amp; Eroglu, C. Building and destroying synaptic bridges: How do Hevin/Sparcl1, SPARC, and MDGAs modify trans-synaptic neurexin-neuroligin interactions?. Structure29, 635&#x2013;637. 10.1016/j.str.2021.06.011 (2021).",
+                  "ArticleIdList": {
+                    "ArticleId": 34214438
+                  }
+                },
+                {
+                  "Citation": "Fan, S., Gangwar, S. P., Machius, M. &amp; Rudenko, G. Interplay between hevin, SPARC, and MDGAs: Modulators of neurexin-neuroligin transsynaptic bridges. Structure29, 664-678.e666. 10.1016/j.str.2021.01.003 (2021).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC8254758",
+                      33535026
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Manchanda, H. et al. Differential biphasic transcriptional host response associated with coevolution of hemagglutinin quasispecies of influenza A virus. Front. Microbiol.7, 1167. 10.3389/fmicb.2016.01167 (2016).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC4971777",
+                      27536272
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Kucukdereli, H. et al. Control of excitatory CNS synaptogenesis by astrocyte-secreted proteins Hevin and SPARC. Proc. Natl. Acad. Sci. USA108, E440-449. 10.1073/pnas.1104977108 (2011).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3156217",
+                      21788491
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Eroglu, C. The role of astrocyte-secreted matricellular proteins in central nervous system development and function. J. Cell Commun. Signal.3, 167&#x2013;176. 10.1007/s12079-009-0078-y (2009).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC2778595",
+                      19904629
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Blakely, P. K., Hussain, S., Carlin, L. E. &amp; Irani, D. N. Astrocyte matricellular proteins that control excitatory synaptogenesis are regulated by inflammatory cytokines and correlate with paralysis severity during experimental autoimmune encephalomyelitis. Front. Neurosci.9, 344. 10.3389/fnins.2015.00344 (2015).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC4598482",
+                      26500475
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Gan, K. J. &amp; S&#xfc;dhof, T. C. SPARCL1 promotes excitatory but not inhibitory synapse formation and function independent of neurexins and neuroligins. J. Neurosci.40, 8088&#x2013;8102. 10.1523/jneurosci.0454-20.2020 (2020).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC7574652",
+                      32973045
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Chaytow, H., Huang, Y. T., Gillingwater, T. H. &amp; Faller, K. M. E. The role of survival motor neuron protein (SMN) in protein homeostasis. Cell Mol. Life Sci.75, 3877&#x2013;3894. 10.1007/s00018-018-2849-1 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6182345",
+                      29872871
+                    ]
+                  }
+                },
+                {
+                  "Citation": "D&#x2019;Amico, A., Mercuri, E., Tiziano, F. D. &amp; Bertini, E. Spinal muscular atrophy. Orphanet. J. Rare Dis.6, 71. 10.1186/1750-1172-6-71 (2011).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3231874",
+                      22047105
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Gonzalez, D., V&#xe1;squez-Doorman, C., Luna, A. &amp; Allende, M. L. Modeling spinal muscular atrophy in zebrafish: current advances and future perspectives. Int. J. Mol. Sci.10.3390/ijms25041962 (2024).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC10888324",
+                      38396640
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Finkel, R. S. et al. Nusinersen versus sham control in infantile-onset spinal muscular atrophy. N. Engl. J. Med.377, 1723&#x2013;1732. 10.1056/NEJMoa1702752 (2017).",
+                  "ArticleIdList": {
+                    "ArticleId": 29091570
+                  }
+                },
+                {
+                  "Citation": "Mercuri, E. et al. Nusinersen versus sham control in later-onset spinal muscular atrophy. N. Engl. J. Med.378, 625&#x2013;635. 10.1056/NEJMoa1710504 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": 29443664
+                  }
+                },
+                {
+                  "Citation": "Germain-Desprez, D. et al. The SMN genes are subject to transcriptional regulation during cellular differentiation. Gene279, 109&#x2013;117. 10.1016/s0378-1119(01)00758-2 (2001).",
+                  "ArticleIdList": {
+                    "ArticleId": 11733135
+                  }
+                },
+                {
+                  "Citation": "Hasan, S. et al. Multi-modal proteomic characterization of lysosomal function and proteostasis in progranulin-deficient neurons. Mol. Neurodegener.18, 87. 10.1186/s13024-023-00673-w (2023).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC10655356",
+                      37974165
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Zhang, J. et al. Neurotoxic microglia promote TDP-43 proteinopathy in progranulin deficiency. Nature588, 459&#x2013;465. 10.1038/s41586-020-2709-7 (2020).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC7746606",
+                      32866962
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Tanaka, Y. et al. Dysregulation of the progranulin-driven autophagy-lysosomal pathway mediates secretion of the nuclear protein TDP-43. J. Biol. Chem.299, 105272. 10.1016/j.jbc.2023.105272 (2023).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC10641265",
+                      37739033
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Spina, S. et al. Clinicopathologic features of frontotemporal dementia with progranulin sequence variation. Neurology68, 820&#x2013;827. 10.1212/01.wnl.0000254460.31273.2d (2007).",
+                  "ArticleIdList": {
+                    "ArticleId": 17202431
+                  }
+                },
+                {
+                  "Citation": "Sleegers, K. et al. Progranulin genetic variability contributes to amyotrophic lateral sclerosis. Neurology71, 253&#x2013;259. 10.1212/01.wnl.0000289191.54852.75 (2008).",
+                  "ArticleIdList": {
+                    "ArticleId": 18184915
+                  }
+                },
+                {
+                  "Citation": "Van Damme, P. et al. Progranulin functions as a neurotrophic factor to regulate neurite outgrowth and enhance neuronal survival. J. Cell Biol.181, 37&#x2013;41. 10.1083/jcb.200712039 (2008).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC2287280",
+                      18378771
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Feng, T. et al. AAV-GRN partially corrects motor deficits and ALS/FTLD-related pathology in Tmem106b(-/-)Grn(-/-) mice. iScience26, 107247. 10.1016/j.isci.2023.107247 (2023).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC10371829",
+                      37519899
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Lev, S. et al. Protein tyrosine kinase PYK2 involved in Ca(2+)-induced regulation of ion channel and MAP kinase functions. Nature376, 737&#x2013;745. 10.1038/376737a0 (1995).",
+                  "ArticleIdList": {
+                    "ArticleId": 7544443
+                  }
+                },
+                {
+                  "Citation": "Xiong, W. C. &amp; Mei, L. Roles of FAK family kinases in nervous system. Front. Biosci.8, s676-682. 10.2741/1116 (2003).",
+                  "ArticleIdList": {
+                    "ArticleId": 12700130
+                  }
+                },
+                {
+                  "Citation": "Haglund, K., Ivankovic-Dikic, I., Shimokawa, N., Kruh, G. D. &amp; Dikic, I. Recruitment of Pyk2 and Cbl to lipid rafts mediates signals important for actin reorganization in growing neurites. J. Cell Sci.117, 2557&#x2013;2568. 10.1242/jcs.01148 (2004).",
+                  "ArticleIdList": {
+                    "ArticleId": 15128873
+                  }
+                },
+                {
+                  "Citation": "Mastrolia, V., Al Massadi, O., de Pins, B. &amp; Girault, J. A. Pyk2 in dorsal hippocampus plays a selective role in spatial memory and synaptic plasticity. Sci. Rep.11, 16357. 10.1038/s41598-021-95813-x (2021).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC8358019",
+                      34381140
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Giralt, A., Coura, R. &amp; Girault, J. A. Pyk2 is essential for astrocytes mobility following brain lesion. Glia64, 620&#x2013;634. 10.1002/glia.22952 (2016).",
+                  "ArticleIdList": {
+                    "ArticleId": 26663135
+                  }
+                },
+                {
+                  "Citation": "L&#xf3;pez-Molina, L. et al. Hippocampal Pyk2 regulates specific social skills: Implications for schizophrenia. Neurobiol. Dis.194, 106487. 10.1016/j.nbd.2024.106487 (2024).",
+                  "ArticleIdList": {
+                    "ArticleId": 38552722
+                  }
+                },
+                {
+                  "Citation": "Calhoun, M. E. et al. Comparative evaluation of synaptophysin-based methods for quantification of synapses. J. Neurocytol.25, 821&#x2013;828. 10.1007/bf02284844 (1996).",
+                  "ArticleIdList": {
+                    "ArticleId": 9023727
+                  }
+                },
+                {
+                  "Citation": "McMahon, H. T. et al. Synaptophysin, a major synaptic vesicle protein, is not essential for neurotransmitter release. Proc. Natl. Acad. Sci. USA93, 4760&#x2013;4764. 10.1073/pnas.93.10.4760 (1996).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC39352",
+                      8643476
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Rasband, M. N. &amp; Peles, E. Mechanisms of node of Ranvier assembly. Nat. Rev. Neurosci.22, 7&#x2013;20. 10.1038/s41583-020-00406-8 (2021).",
+                  "ArticleIdList": {
+                    "ArticleId": 33239761
+                  }
+                },
+                {
+                  "Citation": "Uncini, A., Susuki, K. &amp; Yuki, N. Nodo-paranodopathy: Beyond the demyelinating and axonal classification in anti-ganglioside antibody-mediated neuropathies. Clin. Neurophysiol.10.1016/j.clinph.2013.03.025 (2013).",
+                  "ArticleIdList": {
+                    "ArticleId": 23639374
+                  }
+                },
+                {
+                  "Citation": "Zhang, C., Susuki, K., Zollinger, D. R., Dupree, J. L. &amp; Rasband, M. N. Membrane domain organization of myelinated axons requires &#x3b2;II spectrin. J. Cell Biol.203, 437&#x2013;443. 10.1083/jcb.201308116 (2013).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3824014",
+                      24217619
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Cousin, M. A. et al. Pathogenic SPTBN1 variants cause an autosomal dominant neurodevelopmental syndrome. Nat. Genet.53, 1006&#x2013;1021. 10.1038/s41588-021-00886-z (2021).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC8273149",
+                      34211179
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Horresh, I., Bar, V., Kissil, J. L. &amp; Peles, E. Organization of myelinated axons by Caspr and Caspr2 requires the cytoskeletal adapter protein 4.1B. J. Neurosci.30, 2480&#x2013;2489. 10.1523/jneurosci.5225-09.2010 (2010).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC2836844",
+                      20164332
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Cifuentes-Diaz, C. et al. Protein 4.1B contributes to the organization of peripheral myelinated axons. PLoS ONE6, e25043. 10.1371/journal.pone.0025043 (2011).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3180372",
+                      21966409
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Einheber, S. et al. The 4.1B cytoskeletal protein regulates the domain organization and sheath thickness of myelinated axons. Glia61, 240&#x2013;253. 10.1002/glia.22430 (2013).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3527682",
+                      23109359
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Leterrier, C. The axon initial segment: an updated viewpoint. J. Neurosci.38, 2135&#x2013;2145. 10.1523/jneurosci.1922-17.2018 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC6596274",
+                      29378864
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Jamann, N., Jordan, M. &amp; Engelhardt, M. Activity-dependent axonal plasticity in sensory systems. Neuroscience368, 268&#x2013;282. 10.1016/j.neuroscience.2017.07.035 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": 28739523
+                  }
+                },
+                {
+                  "Citation": "Rotterman, T. M. et al. Axon initial segment geometry in relation to motoneuron excitability. PLoS ONE16, e0259918. 10.1371/journal.pone.0259918 (2021).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC8604372",
+                      34797870
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Huang, C. Y. &amp; Rasband, M. N. Axon initial segments: structure, function, and disease. Ann. N. Y. Acad. Sci.1420, 46&#x2013;61. 10.1111/nyas.13718 (2018).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC5992072",
+                      29749636
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Garrido, J. J. Contribution of axon initial segment structure and channels to brain pathology. Cells10.3390/cells12081210 (2023).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC10137252",
+                      37190119
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Galiano, M. R. et al. A distal axonal cytoskeleton forms an intra-axonal boundary that controls axon initial segment assembly. Cell149, 1125&#x2013;1139. 10.1016/j.cell.2012.03.039 (2012).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3361702",
+                      22632975
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Duflocq, A., Chareyre, F., Giovannini, M., Couraud, F. &amp; Davenne, M. Characterization of the axon initial segment (AIS) of motor neurons and identification of a para-AIS and a juxtapara-AIS, organized by protein 4.1B. BMC biology9, 66. 10.1186/1741-7007-9-66 (2011).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3198992",
+                      21958379
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Hafer-Macko, C. et al. Acute motor axonal neuropathy: An antibody-mediated attack on axolemma. Ann. Neurol.40, 635&#x2013;644 (1996).",
+                  "ArticleIdList": {
+                    "ArticleId": 8871584
+                  }
+                },
+                {
+                  "Citation": "Hafer-Macko, C. E. et al. Immune attack on the Schwann cell surface in acute inflammatory demyelinating polyneuropathy. Ann. Neurol.39, 625&#x2013;635. 10.1002/ana.410390512 (1996).",
+                  "ArticleIdList": {
+                    "ArticleId": 8619548
+                  }
+                },
+                {
+                  "Citation": "Susuki, K. Node of Ranvier disruption as a cause of neurological diseases. ASN neuro5, 209&#x2013;219 (2013).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3736360",
+                      23834220
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Eshed-Eisenbach, Y., Brophy, P. J. &amp; Peles, E. Nodes of Ranvier in health and disease. J. Peripheral Nervous Syst.28(Suppl 3), S3&#x2013;S11 (2023).",
+                  "ArticleIdList": {
+                    "ArticleId": 37272548
+                  }
+                },
+                {
+                  "Citation": "Beaudet, M. J. et al. High yield extraction of pure spinal motor neurons, astrocytes and microglia from single embryo and adult mouse spinal cord. Sci. Rep.5, 16763. 10.1038/srep16763 (2015).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC4649473",
+                      26577180
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Obrador, E. et al. Nicotinamide riboside and pterostilbene cooperatively delay motor neuron failure in ALS SOD1(G93A) Mice. Mol. Neurobiol.58, 1345&#x2013;1371. 10.1007/s12035-020-02188-7 (2021).",
+                  "ArticleIdList": {
+                    "ArticleId": 33174130
+                  }
+                },
+                {
+                  "Citation": "Duhan, N. &amp; Kaundal, R. pySeqRNA: an automated Pytho package for RNA sequencing data analysis. F10000Research 2020 1128 poster 10.7490/f1000research.1118314.1 (2020)."
+                },
+                {
+                  "Citation": "Dobin, A. et al. STAR: ultrafast universal RNA-seq aligner. Bioinformatics29, 15&#x2013;21. 10.1093/bioinformatics/bts635 (2013).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC3530905",
+                      23104886
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Liao, Y., Smyth, G. K. &amp; Shi, W. featureCounts: an efficient general purpose program for assigning sequence reads to genomic features. Bioinformatics30, 923&#x2013;930. 10.1093/bioinformatics/btt656 (2014).",
+                  "ArticleIdList": {
+                    "ArticleId": 24227677
+                  }
+                },
+                {
+                  "Citation": "Love, M. I., Huber, W. &amp; Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol.15, 550. 10.1186/s13059-014-0550-8 (2014).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC4302049",
+                      25516281
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Frehner, S. S. et al. Effect of sex and autism spectrum disorder on oxytocin receptor binding and mRNA expression in the dopaminergic pars compacta of the human substantia nigra. Philos. Trans. R. Soc. Lond. B Biol. Sci.377, 20210118. 10.1098/rstb.2021.0118 (2022).",
+                  "ArticleIdList": {
+                    "ArticleId": [
+                      "PMC9272142",
+                      35858098
+                    ]
+                  }
+                },
+                {
+                  "Citation": "Morrey, J. D., Smee, D. F., Sidwell, R. W. &amp; Tseng, C. K. Identification of active compounds against a New York isolate of West Nile virus. Antiviral Res.55, 107&#x2013;116 (2002).",
+                  "ArticleIdList": {
+                    "ArticleId": 12076755
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+}

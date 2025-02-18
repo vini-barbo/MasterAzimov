@@ -7,6 +7,10 @@
 /bazel-out
 .env
 
+# Dependency directories
+/POC/node_modules
+/POC/package-lock.json
+
 # Node
 fe/node_modules
 fe/npm-debug.log
