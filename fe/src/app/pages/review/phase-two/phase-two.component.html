@@ -2,7 +2,42 @@
     <p-fluid class="grid md:flex-row gap-8">
         <form (ngSubmit)="onSubmit()" #textForm="ngForm">
             <div class="card grid gap-4">
-                <h3>Query:</h3>
+                <h1>Query</h1>
+                <div class="grid lg:grid-cols-4 gap-10">
+                    <div class="lg:col-span-3 flex flex-col justify-between">
+                        <h3>Date range:</h3>
+                        <div class="grid grid-cols-2 gap-2 lg:gap-10">
+                            <div>
+                                <div class="font-semibold text-xl">From :</div>
+                                <p-datepicker [showIcon]="true"
+                                    [showButtonBar]="true" la></p-datepicker>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-xl">To :</div>
+                                <p-datepicker [showIcon]="true"
+                                    [showButtonBar]="true"></p-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-between">
+                        <h3>Search into:</h3>
+                        <div class>
+                            <div class="flex items-center">
+                                <p-toggleswitch />
+                                <label for="checkOption3"
+                                    class="ml-2">PUBMED</label>
+
+                            </div>
+                            <div class="flex items-center">
+                                <p-toggleswitch />
+                                <label for="checkOption3"
+                                    class="ml-2">IEEE</label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex flex-wrap gap-6">
                     <textarea
                         pTextarea
@@ -14,15 +49,28 @@
                         [(ngModel)]="formData.text"
                         required></textarea>
                 </div>
-                <p-button label="Search" type="submit"></p-button>
+                <p-button type="button" label="Search" type="submit"
+                    icon="pi pi-search" [loading]="loading" />
             </div>
         </form>
     </p-fluid>
     <p-fluid class="card grid md:flex-row gap-8">
         <h3>Results:</h3>
+        <div class="grid lg:grid-cols-2 gap-4 ">
+            <app-resultcard *ngFor="let data of articleSourceFoundResult()"
+                [title]="data.title"
+                [value]="data.value"
+                [textColor]="data.textColor"
+                [bgColor]="data.bgColor"
+                [label]="data.label"
+                [iconUrl]="data.iconUrl"
+                [iconAlt]="data.iconAlt">
 
-        <app-article-table
+            </app-resultcard>
+        </div>
+
+        <!-- <app-article-table
             [data]="submittedData" [loading]="loadingTable">
-        </app-article-table>
+        </app-article-table> -->
     </p-fluid>
 </main>
