@@ -8,9 +8,8 @@ describe('PhaseTwoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PhaseTwoComponent ]
-    })
-    .compileComponents();
+      declarations: [PhaseTwoComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

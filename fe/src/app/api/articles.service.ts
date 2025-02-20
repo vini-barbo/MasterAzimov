@@ -9,10 +9,9 @@ import { environment } from '../../enviroments/enviroment';
 export class ArticlesService {
   private Url = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getArticlesSummary(query: string): Observable<any> {
     return this.http.get<any>(this.Url + '/search/summary', { params: { query: query, qtd: 5 } });
   }
-
 }
