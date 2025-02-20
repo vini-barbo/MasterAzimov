@@ -28,7 +28,8 @@ export class AppMenu {
                 label: 'Review',
                 items: [
                     { label: 'Identification', icon: 'pi pi-id-card', routerLink: ['/review/phase-one'] },
-                    { label: 'Search string', icon: 'pi pi-fw pi-search', routerLink: ['/review/phase-two'] }
+                    { label: 'Search string', icon: 'pi pi-fw pi-search', routerLink: ['/review/phase-two'] },
+                    { label: 'Results', icon: 'pi pi-fw pi-table', routerLink: ['/review/phase-three'] }
                 ]
             },
             {

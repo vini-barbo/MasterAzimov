@@ -27,23 +27,14 @@ interface expandedRows {
     selector: 'app-article-table',
     standalone: true,
     imports: [
-        FluidModule,
         TableModule,
         MultiSelectModule,
         SelectModule,
         InputIconModule,
-        TagModule,
-        InputTextModule,
-        SliderModule,
-        ProgressBarModule,
         ToggleButtonModule,
         ToastModule,
         CommonModule,
-        FormsModule,
         ButtonModule,
-        RatingModule,
-        RippleModule,
-        IconFieldModule
     ],
     template: `
             <p-table
@@ -125,12 +116,12 @@ interface expandedRows {
                 </ng-template>
                 <ng-template #emptymessage>
                     <tr>
-                        <td colspan="8">No customers found.</td>
+                        <td colspan="8">No Article found.</td>
                     </tr>
                 </ng-template>
                 <ng-template #loadingbody>
                     <tr>
-                        <td colspan="8">Loading customers data. Please wait.</td>
+                        <td colspan="8">Loading Article data. Please wait.</td>
                     </tr>
                 </ng-template>
             </p-table>
