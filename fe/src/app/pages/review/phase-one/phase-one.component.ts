@@ -1,5 +1,5 @@
 import { FluidModule } from 'primeng/fluid';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -9,7 +9,14 @@ import { TextareaModule } from 'primeng/textarea';
 @Component({
   selector: 'app-phase-one',
 
-  imports: [InputTextModule, FluidModule, ButtonModule, SelectModule, FormsModule, TextareaModule],
+  imports: [
+    InputTextModule,
+    FluidModule,
+    ButtonModule,
+    SelectModule,
+    FormsModule,
+    TextareaModule,
+  ],
   template: `
     <main>
       <p-fluid class="grid grid-cols-1 md:flex-row gap-8">
@@ -45,7 +52,12 @@ import { TextareaModule } from 'primeng/textarea';
             </div>
             <div class="flex flex-wrap gap-6">
               <label for="address">Abstract</label>
-              <textarea pTextarea id="address" rows="5" cols="30" class="resize-none"></textarea>
+              <textarea
+                pTextarea
+                id="address"
+                rows="5"
+                cols="30"
+                class="resize-none"></textarea>
             </div>
             <p-button label="Save" />
           </div>
@@ -54,7 +66,7 @@ import { TextareaModule } from 'primeng/textarea';
     </main>
   `,
 })
-export class PhaseOneComponent implements OnInit {
+export class PhaseOneComponent {
   dropdownItems = [
     { name: 'Review', code: 'Review' },
     { name: 'Article', code: 'Article' },

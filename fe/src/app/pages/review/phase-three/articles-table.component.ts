@@ -1,22 +1,12 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { InputTextModule } from 'primeng/inputtext';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
-import { SliderModule } from 'primeng/slider';
 import { Table, TableModule } from 'primeng/table';
-import { ProgressBarModule } from 'primeng/progressbar';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ToastModule } from 'primeng/toast';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { RatingModule } from 'primeng/rating';
-import { RippleModule } from 'primeng/ripple';
 import { InputIconModule } from 'primeng/inputicon';
-import { IconFieldModule } from 'primeng/iconfield';
-import { TagModule } from 'primeng/tag';
-import { FluidModule } from 'primeng/fluid';
 import { IEsummaryResultItem } from '../../../api/types/IEsummary';
 
 interface expandedRows {
@@ -153,7 +143,7 @@ interface expandedRows {
   `,
   providers: [],
 })
-export class ArticleTable implements OnInit {
+export class ArticleTableComponent {
   @Input() data!: IEsummaryResultItem[];
   @Input() loading: boolean = false;
 
@@ -169,20 +159,16 @@ export class ArticleTable implements OnInit {
 
   @ViewChild('filter') filter!: ElementRef;
 
-  constructor() {}
-
-  ngOnInit() {}
-
-  onGlobalFilter(table: Table, event: Event) {
+  onGlobalFilter(table: Table, event: Event): any {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  clear(table: Table) {
+  clear(table: Table): any {
     table.clear();
     this.filter.nativeElement.value = '';
   }
 
-  extractAuthors(authors: any) {
+  extractAuthors(authors: any): any {
     return authors.map((author: any) => author.name).join(', ');
   }
 }

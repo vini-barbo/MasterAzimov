@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { FluidModule } from 'primeng/fluid';
@@ -8,14 +8,24 @@ import { TextareaModule } from 'primeng/textarea';
 import { ArticlesService } from '../../../api/articles.service';
 import { IEsummaryResultItem } from '../../../api/types/IEsummary';
 import { CommonModule } from '@angular/common';
-import { ResultCard, IResultCard } from '../../../bonus/uikit/resultcard';
+import { IResultCard } from '../../../bonus/uikit/resultcard';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { ArticleTable } from './articles-table.component';
+import { ArticleTableComponent } from './articles-table.component';
 
 @Component({
   selector: 'app-phase-three',
-  templateUrl: './phase-three.component.html',
+  template: `
+    <main>
+      <p-fluid class="card grid md:flex-row gap-8">
+        <h1>Results :</h1>
+        <app-article-table
+          [data]="submittedData"
+          [loading]="loading"></app-article-table>
+      </p-fluid>
+    </main>
+  `,
+
   providers: [ArticlesService],
   imports: [
     InputTextModule,
@@ -27,10 +37,10 @@ import { ArticleTable } from './articles-table.component';
     FormsModule,
     TextareaModule,
     CommonModule,
-    ArticleTable,
+    ArticleTableComponent,
   ],
 })
-export class PhaseThreeComponent implements OnInit {
+export class PhaseThreeComponent {
   constructor(private readonly articleService: ArticlesService) {}
 
   articleSourceFoundResult: WritableSignal<IResultCard[]> = signal([
@@ -73,6 +83,4 @@ export class PhaseThreeComponent implements OnInit {
       },
     });
   }
-
-  ngOnInit(): void {}
 }
