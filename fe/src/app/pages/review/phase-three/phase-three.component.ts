@@ -1,4 +1,4 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { FluidModule } from 'primeng/fluid';
@@ -19,9 +19,8 @@ import { ArticleTableComponent } from './articles-table.component';
     <main>
       <p-fluid class="card grid md:flex-row gap-8">
         <h1>Results :</h1>
-        <app-article-table
-          [data]="submittedData"
-          [loading]="loading"></app-article-table>
+        <app-article-table [data]="submittedData" [loading]="loading">
+        </app-article-table>
       </p-fluid>
     </main>
   `,
@@ -40,7 +39,7 @@ import { ArticleTableComponent } from './articles-table.component';
     ArticleTableComponent,
   ],
 })
-export class PhaseThreeComponent {
+export class PhaseThreeComponent implements OnInit {
   constructor(private readonly articleService: ArticlesService) {}
 
   articleSourceFoundResult: WritableSignal<IResultCard[]> = signal([
@@ -68,6 +67,9 @@ export class PhaseThreeComponent {
   submittedData!: IEsummaryResultItem[];
   loading: boolean = false;
 
+  ngOnInit(): void {
+    this.onSubmit();
+  }
   onSubmit(): void {
     this.loading = true;
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { FluidModule } from 'primeng/fluid';
@@ -14,7 +14,86 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-phase-two',
-  templateUrl: './phase-two.component.html',
+  template: `
+    <main>
+      <p-fluid class="grid md:flex-row gap-8">
+        <form (ngSubmit)="onSubmit()" #textForm="ngForm">
+          <div class="card grid gap-4">
+            <h1>Query</h1>
+            <div class="grid lg:grid-cols-4 gap-10">
+              <div class="lg:col-span-3 flex flex-col justify-between">
+                <h3>Date range:</h3>
+                <div class="grid grid-cols-2 gap-2 lg:gap-10">
+                  <div>
+                    <div class="font-semibold text-xl">From :</div>
+                    <p-datepicker
+                      [showIcon]="true"
+                      [showButtonBar]="true"
+                      la></p-datepicker>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-xl">To :</div>
+                    <p-datepicker
+                      [showIcon]="true"
+                      [showButtonBar]="true"></p-datepicker>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col justify-between">
+                <h3>Search into:</h3>
+                <div class>
+                  <div class="flex items-center">
+                    <p-toggleswitch />
+                    <label for="checkOption3" class="ml-2">PUBMED</label>
+                  </div>
+                  <div class="flex items-center">
+                    <p-toggleswitch />
+                    <label for="checkOption3" class="ml-2">IEEE</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-6">
+              <textarea
+                pTextarea
+                id="address"
+                name="textField"
+                rows="5"
+                cols="30"
+                class="resize-none"
+                [(ngModel)]="formData.text"
+                required></textarea>
+            </div>
+            <p-button
+              type="button"
+              label="Search"
+              type="submit"
+              icon="pi pi-search"
+              [loading]="loading" />
+          </div>
+        </form>
+      </p-fluid>
+      <p-fluid class="card grid md:flex-row gap-8">
+        <h3>Preview:</h3>
+        <div class="grid lg:grid-cols-2 gap-4">
+          <app-resultcard
+            *ngFor="let data of articleSourceFoundResult()"
+            [title]="data.title"
+            [value]="data.value"
+            [textColor]="data.textColor"
+            [bgColor]="data.bgColor"
+            [label]="data.label"
+            [iconUrl]="data.iconUrl"
+            [iconAlt]="data.iconAlt"></app-resultcard>
+        </div>
+
+        <!-- <app-article-table
+            [data]="submittedData" [loading]="loadingTable">
+        </app-article-table> -->
+      </p-fluid>
+    </main>
+  `,
   providers: [ArticlesService],
   imports: [
     InputTextModule,
@@ -29,7 +108,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     ResultCard,
   ],
 })
-export class PhaseTwoComponent implements OnInit {
+export class PhaseTwoComponent {
   constructor(private readonly articleService: ArticlesService) {}
 
   articleSourceFoundResult: WritableSignal<IResultCard[]> = signal([
@@ -72,6 +151,4 @@ export class PhaseTwoComponent implements OnInit {
       },
     });
   }
-
-  ngOnInit(): void {}
 }
