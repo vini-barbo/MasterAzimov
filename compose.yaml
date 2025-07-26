@@ -127,21 +127,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # Adminer - Interface web alternativa para banco de dados (leve)
-  adminer:
-    image: adminer:latest
-    container_name: igem-adminer-dev
-    ports:
-      - "8081:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=database
-      - ADMINER_DESIGN=pepa-linha
-    networks:
-      - igem-network
-    depends_on:
-      database:
-        condition: service_healthy
-    restart: unless-stopped
 
  
 volumes:

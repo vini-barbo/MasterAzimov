@@ -1,7 +1,7 @@
 # Makefile para o projeto IGEM Stock Management System
 # Comandos para gerenciar containers, banco de dados e aplicação
 
-.PHONY: help up down restart logs build clean install migrate seed dev prod backup restore test health status shell
+.PHONY: help up down restart logs build clean install migrate seed dev prod backup restore test health status shell docker-up docker-down docker-monitor docker-clean docker-status
 
 # Cores para output
 GREEN=\033[0;32m
@@ -15,6 +15,7 @@ COMPOSE_FILE_PROD=compose.prod.yaml
 BACKEND_CONTAINER=igem-stock-backend-dev
 DB_CONTAINER=igem-stock-db-dev
 REDIS_CONTAINER=igem-stock-redis-dev
+DOCKER_MANAGER=./docker-manager.sh
 
 # Comando padrão
 help: ## Mostra esta ajuda
@@ -26,7 +27,35 @@ help: ## Mostra esta ajuda
 	@echo ""
 
 ## =================================================================
-## COMANDOS DE CONTAINER
+## COMANDOS DE CONTAINER - NOVA GESTÃO
+## =================================================================
+
+docker-up: ## Inicia aplicação usando o gerenciador Docker
+	@echo "$(GREEN)Iniciando aplicação com gerenciador Docker...$(NC)"
+	$(DOCKER_MANAGER) up
+
+docker-down: ## Para aplicação usando o gerenciador Docker
+	@echo "$(YELLOW)Parando aplicação com gerenciador Docker...$(NC)"
+	$(DOCKER_MANAGER) down
+
+docker-monitor: ## Inicia sistema de monitoramento usando o gerenciador Docker
+	@echo "$(GREEN)Iniciando sistema de monitoramento...$(NC)"
+	$(DOCKER_MANAGER) monitor-up
+
+docker-clean: ## Limpa completamente todos os containers usando o gerenciador Docker
+	@echo "$(RED)Limpeza completa dos containers...$(NC)"
+	$(DOCKER_MANAGER) clean-all
+
+docker-status: ## Mostra status dos containers usando o gerenciador Docker
+	@echo "$(GREEN)Status dos containers:$(NC)"
+	$(DOCKER_MANAGER) status
+
+docker-restart: ## Reinicia aplicação usando o gerenciador Docker
+	@echo "$(YELLOW)Reiniciando aplicação...$(NC)"
+	$(DOCKER_MANAGER) restart
+
+## =================================================================
+## COMANDOS DE CONTAINER - MODO LEGADO
 ## =================================================================
 
 up: ## Inicia todos os containers em modo desenvolvimento
@@ -64,7 +93,6 @@ up-web: ## Inicia serviços e abre todas interfaces no navegador
 	@command -v xdg-open > /dev/null && xdg-open http://localhost:3000/api/docs || echo "API Docs: http://localhost:3000/api/docs"
 	@command -v xdg-open > /dev/null && xdg-open http://localhost:5050 || echo "pgAdmin: http://localhost:5050"
 	@command -v xdg-open > /dev/null && xdg-open http://localhost:8001 || echo "RedisInsight: http://localhost:8001"
-	@command -v xdg-open > /dev/null && xdg-open http://localhost:8081 || echo "Adminer: http://localhost:8081"
 	@echo "$(GREEN)Todos os serviços iniciados e interfaces abertas!$(NC)"
 	@$(MAKE) health
 
@@ -182,6 +210,14 @@ adminer: ## Abre Adminer (interface web alternativa para banco)
 test: ## Executa todos os testes
 	@echo "$(GREEN)Executando testes...$(NC)"
 	docker compose -f $(COMPOSE_FILE) exec backend npm run test
+
+test-watch: ## Executa testes em modo watch
+	@echo "$(GREEN)Executando testes em modo watch...$(NC)"
+	docker compose -f $(COMPOSE_FILE) exec backend npm run test:watch
+
+test-coverage: ## Executa testes com coverage
+	@echo "$(GREEN)Executando testes com coverage...$(NC)"
+	docker compose -f $(COMPOSE_FILE) exec backend npm run test:cov
 
 test-e2e: ## Executa testes end-to-end
 	@echo "$(GREEN)Executando testes e2e...$(NC)"
@@ -305,11 +341,31 @@ curl-test: ## Testa endpoints básicos da API
 	@curl -s http://localhost:3000/api/products | jq . || echo "jq não instalado"
 
 ## =================================================================
-## COMANDOS COMBINADOS
+## COMANDOS COMBINADOS - ATUALIZADOS
 ## =================================================================
 
-fresh-start: ## Para tudo, limpa, reconstroi e inicia
-	@echo "$(YELLOW)Reinicialização completa...$(NC)"
+fresh-start: ## Para tudo, limpa, reconstroi e inicia usando novo gerenciador
+	@echo "$(YELLOW)Reinicialização completa com novo gerenciador...$(NC)"
+	@$(MAKE) docker-clean
+	@$(MAKE) build
+	@$(MAKE) docker-up
+	@sleep 10
+	@$(MAKE) migrate-dev
+	@$(MAKE) seed
+
+quick-start: ## Início rápido para desenvolvimento usando novo gerenciador
+	@echo "$(GREEN)Início rápido com novo gerenciador...$(NC)"
+	@$(MAKE) docker-up
+	@sleep 10
+	@$(MAKE) migrate-dev
+	@$(MAKE) seed
+
+## =================================================================
+## COMANDOS COMBINADOS - MODO LEGADO
+## =================================================================
+
+legacy-fresh-start: ## Para tudo, limpa, reconstroi e inicia (modo legado)
+	@echo "$(YELLOW)Reinicialização completa (modo legado)...$(NC)"
 	@$(MAKE) down
 	@$(MAKE) clean-volumes
 	@$(MAKE) build
@@ -317,8 +373,8 @@ fresh-start: ## Para tudo, limpa, reconstroi e inicia
 	@$(MAKE) migrate-dev
 	@$(MAKE) seed
 
-quick-start: ## Início rápido para desenvolvimento
-	@echo "$(GREEN)Início rápido...$(NC)"
+legacy-quick-start: ## Início rápido para desenvolvimento (modo legado)
+	@echo "$(GREEN)Início rápido (modo legado)...$(NC)"
 	@$(MAKE) up-infra
 	@sleep 5
 	@$(MAKE) migrate-dev
@@ -352,8 +408,31 @@ info: ## Mostra informações do projeto
 	@echo "$(YELLOW)Redis:$(NC)"
 	@echo "  Host: localhost:6379"
 	@echo ""
-	@echo "$(YELLOW)Comandos úteis:$(NC)"
-	@echo "  make quick-start  # Início rápido"
+	@echo "$(YELLOW)Comandos úteis (NOVOS - RECOMENDADOS):$(NC)"
+	@echo "  make docker-up       # Início da aplicação (novo método)"
+	@echo "  make docker-down     # Parar aplicação (novo método)"
+	@echo "  make docker-clean    # Limpeza completa (novo método)"
+	@echo "  make docker-status   # Status dos containers (novo método)"
+	@echo "  make quick-start     # Início rápido (novo método)"
+	@echo ""
+	@echo "$(YELLOW)Comandos úteis (LEGADO):$(NC)"
+	@echo "  make up              # Início da aplicação (método legado)"
+	@echo "  make down            # Parar aplicação (método legado)"
+	@echo "  make legacy-quick-start # Início rápido (método legado)"
+	@echo ""
+	@echo "$(YELLOW)Comandos de desenvolvimento:$(NC)"
+	@echo "  make docker-up       # Início da aplicação (novo método)"
+	@echo "  make docker-down     # Parar aplicação (novo método)"
+	@echo "  make docker-clean    # Limpeza completa (novo método)"
+	@echo "  make docker-status   # Status dos containers (novo método)"
+	@echo "  make quick-start     # Início rápido (novo método)"
+	@echo ""
+	@echo "$(YELLOW)Comandos úteis (LEGADO):$(NC)"
+	@echo "  make up              # Início da aplicação (método legado)"
+	@echo "  make down            # Parar aplicação (método legado)"
+	@echo "  make legacy-quick-start # Início rápido (método legado)"
+	@echo ""
+	@echo "$(YELLOW)Comandos de desenvolvimento:$(NC)"
 	@echo "  make dev          # Modo desenvolvimento"
 	@echo "  make logs-backend # Ver logs"
 	@echo "  make shell        # Shell do backend"
@@ -361,6 +440,9 @@ info: ## Mostra informações do projeto
 	@echo "  make redisinsight # Interface do Redis"
 	@echo "  make adminer      # Interface alternativa do banco"
 	@echo "  make api-docs     # Ver documentação da API"
+	@echo "  make test         # Executar testes"
+	@echo "  make test-watch   # Testes em modo watch"
+	@echo "  make test-coverage # Testes com coverage"
 	@echo ""
 
 # Comando padrão quando executar apenas 'make'

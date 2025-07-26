@@ -1,0 +1,25 @@
+{
+  "name": "Test Suite Configuration",
+  "displayName": "IGEM Stock API Tests",
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "src",
+  "testRegex": ".*\\.spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "collectCoverageFrom": [
+    "**/*.(t|j)s",
+    "!**/*.spec.ts",
+    "!**/*.interface.ts",
+    "!**/*.dto.ts",
+    "!**/node_modules/**",
+    "!**/dist/**"
+  ],
+  "coverageDirectory": "../coverage",
+  "coverageReporters": ["text", "lcov", "html"],
+  "testEnvironment": "node",
+  "setupFilesAfterEnv": ["<rootDir>/../test/setup.ts"],
+  "moduleNameMapping": {
+    "^@/(.*)$": "<rootDir>/$1"
+  }
+}
