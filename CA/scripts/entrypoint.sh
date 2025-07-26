@@ -4,9 +4,13 @@ set -e
 # Redis Entrypoint Script
 echo "Starting Redis Cache..."
 
-# Create necessary directories
-mkdir -p /var/run/redis /var/log/redis /data
-chown redis:redis /var/run/redis /var/log/redis /data
+# Ensure directories exist and have correct permissions
+[ -d /var/run/redis ] || mkdir -p /var/run/redis 2>/dev/null || true
+[ -d /var/log/redis ] || mkdir -p /var/log/redis 2>/dev/null || true
+[ -d /data ] || mkdir -p /data 2>/dev/null || true
+
+# Try to set ownership (will work if running as root, silently fail otherwise)
+chown -f redis:redis /var/run/redis /var/log/redis /data 2>/dev/null || true
 
 # Set default environment variables
 export REDIS_PASSWORD=${REDIS_PASSWORD:-}
@@ -32,20 +36,27 @@ wait_for_redis() {
 
 # Function to setup Redis configuration
 setup_redis_config() {
-    local config_file="/etc/redis/redis.conf"
+    local source_config="/etc/redis/redis.conf"
+    local temp_config="/tmp/redis.conf"
     
-    # Replace environment variables in config
+    # Copy the config file to a writable location
+    cp "$source_config" "$temp_config"
+    
+    # Replace environment variables in temp config
     if [ -n "$REDIS_PASSWORD" ]; then
-        sed -i "s/# requirepass.*/requirepass $REDIS_PASSWORD/" "$config_file"
+        sed -i "s/# requirepass.*/requirepass $REDIS_PASSWORD/" "$temp_config"
     fi
     
     if [ -n "$REDIS_MAXMEMORY" ]; then
-        sed -i "s/maxmemory.*/maxmemory $REDIS_MAXMEMORY/" "$config_file"
+        sed -i "s/maxmemory.*/maxmemory $REDIS_MAXMEMORY/" "$temp_config"
     fi
     
     if [ -n "$REDIS_MAXMEMORY_POLICY" ]; then
-        sed -i "s/maxmemory-policy.*/maxmemory-policy $REDIS_MAXMEMORY_POLICY/" "$config_file"
+        sed -i "s/maxmemory-policy.*/maxmemory-policy $REDIS_MAXMEMORY_POLICY/" "$temp_config"
     fi
+    
+    # Export the temp config path for use in the main command
+    export REDIS_CONFIG_FILE="$temp_config"
 }
 
 # Function to run Redis initialization scripts
@@ -79,7 +90,12 @@ case "$1" in
         setup_redis_config
         
         echo "Starting Redis server..."
-        exec "$@"
+        # Use the modified config file if it was created, otherwise use the original
+        if [ -n "$REDIS_CONFIG_FILE" ] && [ -f "$REDIS_CONFIG_FILE" ]; then
+            exec redis-server "$REDIS_CONFIG_FILE"
+        else
+            exec "$@"
+        fi
         ;;
     redis-cli)
         exec "$@"

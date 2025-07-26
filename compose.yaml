@@ -42,11 +42,13 @@ services:
     volumes:
       - redis_data_dev:/data
       - redis_logs_dev:/var/log/redis
+      - redis_run_dev:/var/run/redis
       - ./CA/config/redis.conf:/etc/redis/redis.conf:ro
       - ./CA/scripts:/usr/local/bin/scripts:ro
     networks:
       - igem-network
-    command: ["redis-server", "/etc/redis/redis.conf"]
+    # Remove the command override to let entrypoint handle config
+    # command: ["redis-server", "/etc/redis/redis.conf"]
     healthcheck:
       test: ["CMD", "/usr/local/bin/healthcheck.sh"]
       interval: 30s
@@ -71,7 +73,6 @@ services:
     volumes:
       - ./BE-IGEMSTOCK:/app
       - /app/node_modules
-      - /app/dist
     networks:
       - igem-network
     depends_on:
@@ -95,6 +96,8 @@ volumes:
   redis_data_dev:
     driver: local
   redis_logs_dev:
+    driver: local
+  redis_run_dev:
     driver: local
 
 networks:

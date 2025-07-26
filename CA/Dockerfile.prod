@@ -8,13 +8,13 @@ RUN apk add --no-cache \
     procps \
     tini
 
-# Create redis user and directories
-RUN addgroup -g 999 redis && \
-    adduser -D -u 999 -G redis redis
+# Create redis user and directories (if they don't exist)
+RUN if ! getent group redis > /dev/null 2>&1; then addgroup -g 999 redis; fi && \
+    if ! getent passwd redis > /dev/null 2>&1; then adduser -D -u 999 -G redis redis; fi
 
 # Create necessary directories
-RUN mkdir -p /data /etc/redis /var/log/redis && \
-    chown -R redis:redis /data /etc/redis /var/log/redis
+RUN mkdir -p /data /etc/redis /var/log/redis /var/run/redis && \
+    chown -R redis:redis /data /etc/redis /var/log/redis /var/run/redis
 
 # Copy configuration files
 COPY config/redis.prod.conf /etc/redis/redis.conf
