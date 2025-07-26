@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and authorization
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Audit fields
+  createdBy String?
+  updatedBy String?
+
+  @@map("users")
+}
+
+// Enum for user roles
+enum UserRole {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+// Stock item model
+model StockItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  sku         String   @unique
+  quantity    Int      @default(0)
+  minQuantity Int      @default(0)
+  maxQuantity Int?
+  unitPrice   Decimal? @db.Decimal(10, 2)
+  category    String?
+  location    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  movements StockMovement[]
+
+  // Audit fields
+  createdBy String?
+  updatedBy String?
+
+  @@map("stock_items")
+}
+
+// Stock movement model for tracking inventory changes
+model StockMovement {
+  id          String         @id @default(cuid())
+  stockItemId String
+  type        MovementType
+  quantity    Int
+  reason      String?
+  notes       String?
+  createdAt   DateTime       @default(now())
+  createdBy   String?
+
+  // Relations
+  stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+
+  @@map("stock_movements")
+}
+
+// Enum for movement types
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  TRANSFER
+}
+
+// Audit log model for tracking all changes
+model AuditLog {
+  id        String   @id @default(cuid())
+  tableName String
+  recordId  String
+  action    String   // INSERT, UPDATE, DELETE
+  oldData   Json?
+  newData   Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
