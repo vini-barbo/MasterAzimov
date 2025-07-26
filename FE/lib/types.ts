@@ -1,3 +1,7 @@
+// Re-export all types from the new type system
+export * from './types'
+
+// Legacy types for backward compatibility
 export interface Supplier {
   id: string
   name: string
