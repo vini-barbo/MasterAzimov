@@ -18,6 +18,7 @@ import configs from './config';
     RedisModule,
     HealthModule,
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })

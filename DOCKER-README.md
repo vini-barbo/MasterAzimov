@@ -38,14 +38,15 @@ docker-compose down -v
   - Database: `igem_stock_dev`
   - User: `postgres`
   - Password: `postgres123`
-- **Redis**: localhost:6379
+- **Redis**: localhost:6379 (configuração customizada da pasta CA)
 
 ### Recursos do Desenvolvimento
 
 - Hot reload automático no backend
 - Volumes montados para desenvolvimento ativo
 - Banco de dados com scripts de inicialização
-- Redis para cache e filas
+- Redis customizado com configurações avançadas, health checks e logs
+- Scripts de manutenção e backup do Redis
 
 ## Ambiente de Produção
 
@@ -90,7 +91,7 @@ docker-compose -f compose.prod.yaml down
 
 - **Backend**: Porta configurada em `BACKEND_PORT` (padrão: 3000)
 - **Banco PostgreSQL**: Porta configurada em `DB_PORT` (padrão: 5432)
-- **Redis**: Porta configurada em `REDIS_PORT` (padrão: 6379)
+- **Redis**: Porta configurada em `REDIS_PORT` (padrão: 6379) - configuração customizada otimizada para produção
 - **Nginx** (opcional): Portas 80 e 443
 
 ### Características de Produção
@@ -103,6 +104,7 @@ docker-compose -f compose.prod.yaml down
 - Nginx como reverse proxy
 - Usuários não-root nos containers
 - Restart policies configuradas
+- Redis customizado com configurações de produção, backup automático e monitoramento
 
 ## SSL/HTTPS (Opcional)
 

@@ -29,19 +29,30 @@ services:
 
   # Redis para cache e filas
   redis:
-    image: redis:7-alpine
+    build:
+      context: ./CA
+      dockerfile: Dockerfile
     container_name: igem-stock-redis-dev
     ports:
       - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_MAXMEMORY=${REDIS_MAXMEMORY:-256mb}
+      - REDIS_MAXMEMORY_POLICY=${REDIS_MAXMEMORY_POLICY:-allkeys-lru}
     volumes:
       - redis_data_dev:/data
+      - redis_logs_dev:/var/log/redis
+      - ./CA/config/redis.conf:/etc/redis/redis.conf:ro
+      - ./CA/scripts:/usr/local/bin/scripts:ro
     networks:
       - igem-network
+    command: ["redis-server", "/etc/redis/redis.conf"]
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   # Backend NestJS
   backend:
@@ -82,6 +93,8 @@ volumes:
   postgres_backups_dev:
     driver: local
   redis_data_dev:
+    driver: local
+  redis_logs_dev:
     driver: local
 
 networks:
