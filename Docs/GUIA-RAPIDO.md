@@ -2,28 +2,43 @@
 
 ## 🚀 Comandos Essenciais
 
-### Docker
+### Gerenciamento de Ambientes
 ```bash
-# Iniciar todo o ambiente
-docker-compose up -d
-
-# Ver logs de um serviço específico
-docker-compose logs -f [service-name]
-
-# Rebuild completo
-docker-compose down && docker-compose up --build -d
+# Script de gerenciamento principal
+./manage.sh dev         # Iniciar desenvolvimento (básico)
+./manage.sh dev-full    # Desenvolvimento completo (com ELK)
+./manage.sh prod        # Iniciar produção
+./manage.sh stop-dev    # Parar desenvolvimento
+./manage.sh stop-prod   # Parar produção
+./manage.sh status      # Status de todos os serviços
+./manage.sh health      # Health check
 ```
 
-### Backend (NestJS)
+### Docker Compose
 ```bash
 # Desenvolvimento
-npm run start:dev
+docker-compose -f compose.yaml up -d
+docker-compose -f compose.yaml down
 
-# Build de produção
-npm run build
+# Produção
+docker-compose -f compose.prod.yaml up -d
+docker-compose -f compose.prod.yaml down
 
-# Testes
-npm run test
+# Logs específicos
+docker-compose logs -f backend
+docker-compose logs -f grafana
+```
+
+### Monitoramento
+```bash
+# Health check completo
+./Monitor/scripts/health-check.sh
+
+# Backup dos dados
+./Monitor/scripts/backup-logs.sh backup
+
+# Setup do monitoramento
+cd Monitor && ./scripts/setup.sh
 ```
 
 ### Banco de Dados
@@ -126,6 +141,12 @@ docker exec [redis-container] redis-cli ping
 - Database: `5432`
 - Redis: `6379`
 - Nginx: `80/443`
+- **Grafana: `3030`**
+- **Prometheus: `9090`**
+- **Kibana: `5601`**
+- **Elasticsearch: `9200`**
+- **AlertManager: `9093`**
+- **Jaeger: `16686`**
 
 ---
 

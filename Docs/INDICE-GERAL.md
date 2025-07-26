@@ -30,6 +30,12 @@ Este documento fornece uma visão geral de toda a documentação disponível no 
 |-----------|-------------|-----------|
 | README PostgreSQL | [`DB/README.md`](./DB/README.md) | Configuração e uso do banco |
 
+### 📊 Monitoramento e Logging
+| Documento | Localização | Descrição |
+|-----------|-------------|-----------|
+| Visão Geral Monitoramento | [`MONITORAMENTO.md`](./MONITORAMENTO.md) | Guia completo do sistema de monitoramento |
+| Setup Detalhado | [`../Monitor/README.md`](../Monitor/README.md) | Documentação técnica completa |
+
 ## 🔍 Busca Rápida por Tópico
 
 ### 🐳 Docker
@@ -60,6 +66,11 @@ Este documento fornece uma visão geral de toda a documentação disponível no 
 1. [`BE-IGEMSTOCK/README.md`](./BE-IGEMSTOCK/README.md) - API e estrutura
 2. [`BE-IGEMSTOCK/DATABASE-REDIS-CONNECTION.md`](./BE-IGEMSTOCK/DATABASE-REDIS-CONNECTION.md) - Conexões
 3. [`BE-IGEMSTOCK/IMPLEMENTACAO-CONCLUIDA.md`](./BE-IGEMSTOCK/IMPLEMENTACAO-CONCLUIDA.md) - Status atual
+
+### Para Monitoramento:
+1. [`MONITORAMENTO.md`](./MONITORAMENTO.md) - Setup e uso do monitoramento
+2. [`../Monitor/README.md`](../Monitor/README.md) - Documentação técnica completa
+3. [`GUIA-RAPIDO.md`](./GUIA-RAPIDO.md) - Comandos de troubleshooting
 
 ## 📝 Manutenção da Documentação
 
