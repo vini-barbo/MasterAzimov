@@ -1,37 +1,89 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  master-azimov-be:
-    image: node:20
-    container_name: master-azimov-be
-    working_dir: /usr/src/app
-    volumes:
-      - ./be:/usr/src/app
-      - /usr/src/app/node_modules
+  # Banco de dados PostgreSQL
+  database:
+    build:
+      context: ./DB
+      dockerfile: Dockerfile
+    container_name: igem-stock-db-dev
+    environment:
+      POSTGRES_DB: igem_stock_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_HOST_AUTH_METHOD: md5
     ports:
-      - "3000:3000"
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - postgres_backups_dev:/var/lib/postgresql/backups
+      - ./DB/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - igem-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d igem_stock_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Redis para cache e filas
+  redis:
+    image: redis:7-alpine
+    container_name: igem-stock-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_dev:/data
+    networks:
+      - igem-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Backend NestJS
+  backend:
+    build:
+      context: ./BE-IGEMSTOCK
+      dockerfile: Dockerfile.dev
+    container_name: igem-stock-backend-dev
     environment:
       NODE_ENV: development
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DATABASE_USER: nest_user
-      DATABASE_PASSWORD: nest_password
-      DATABASE_NAME: nest_db
-    command: sh -c "npm install && npm run start:dev"
-    depends_on:
-      - master-azimov-db
-
-  master-azimov-db:
-    image: postgres
-    container_name: postgres_db
+      DATABASE_URL: postgresql://postgres:postgres123@database:5432/igem_stock_dev?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_jwt_secret_key_change_in_production
+      PORT: 3000
     ports:
-    - "5432:5432"
-    environment:
-      POSTGRES_USER: nest_user
-      POSTGRES_PASSWORD: nest_password
-      POSTGRES_DB: nest_db
+      - "3000:3000"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./BE-IGEMSTOCK:/app
+      - /app/node_modules
+      - /app/dist
+    networks:
+      - igem-network
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
+  postgres_data_dev:
+    driver: local
+  postgres_backups_dev:
+    driver: local
+  redis_data_dev:
+    driver: local
+
+networks:
+  igem-network:
+    driver: bridge

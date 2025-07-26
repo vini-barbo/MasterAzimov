@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  redis:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: redis-cache-prod
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_MAXMEMORY=${REDIS_MAXMEMORY:-2gb}
+      - REDIS_MAXMEMORY_POLICY=${REDIS_MAXMEMORY_POLICY:-allkeys-lru}
+    volumes:
+      - redis_data_prod:/data
+      - redis_logs_prod:/var/log/redis
+      - redis_backups:/backups
+      - ./config/redis.prod.conf:/etc/redis/redis.conf:ro
+      - ./scripts:/usr/local/bin/scripts:ro
+    networks:
+      - redis_network_prod
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: ${REDIS_MEMORY_LIMIT:-4G}
+          cpus: '${REDIS_CPU_LIMIT:-2.0}'
+        reservations:
+          memory: ${REDIS_MEMORY_RESERVATION:-1G}
+          cpus: '${REDIS_CPU_RESERVATION:-0.5}'
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter-prod
+    restart: always
+    ports:
+      - "${REDIS_EXPORTER_PORT:-9121}:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - redis_network_prod
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+
+  # Backup service - runs daily backups
+  redis-backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: redis-backup-prod
+    restart: "no"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
+    volumes:
+      - redis_data_prod:/data:ro
+      - redis_backups:/backups
+      - ./scripts:/usr/local/bin/scripts:ro
+    networks:
+      - redis_network_prod
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["/usr/local/bin/scripts/backup.sh"]
+    profiles:
+      - backup
+
+volumes:
+  redis_data_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${REDIS_DATA_PATH:-./data}
+  redis_logs_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${REDIS_LOGS_PATH:-./logs}
+  redis_backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${REDIS_BACKUP_PATH:-./backups}
+
+networks:
+  redis_network_prod:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+    driver_opts:
+      com.docker.network.bridge.name: redis-prod-br

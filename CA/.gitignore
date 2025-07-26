@@ -1,0 +1,40 @@
+# Logs
+logs/
+*.log
+
+# Data directories
+data/
+backups/
+
+# Environment files (keep templates)
+.env
+
+# Docker volumes
+redis_data/
+redis_logs/
+redis_backups/
+
+# Temporary files
+*.tmp
+*.temp
+
+# MacOS
+.DS_Store
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.rdb.gz
+*.aof.gz
+dump.rdb.backup

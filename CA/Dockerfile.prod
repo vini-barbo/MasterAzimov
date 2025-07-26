@@ -1,0 +1,43 @@
+# Redis Cache Dockerfile for Production
+FROM redis:8.0-alpine
+
+# Install necessary packages for production
+RUN apk add --no-cache \
+    bash \
+    curl \
+    procps \
+    tini
+
+# Create redis user and directories
+RUN addgroup -g 999 redis && \
+    adduser -D -u 999 -G redis redis
+
+# Create necessary directories
+RUN mkdir -p /data /etc/redis /var/log/redis && \
+    chown -R redis:redis /data /etc/redis /var/log/redis
+
+# Copy configuration files
+COPY config/redis.prod.conf /etc/redis/redis.conf
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
+COPY scripts/backup.sh /usr/local/bin/backup.sh
+
+# Make scripts executable
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/healthcheck.sh /usr/local/bin/backup.sh
+
+# Set up log rotation
+COPY config/logrotate.conf /etc/logrotate.d/redis
+
+# Switch to redis user
+USER redis
+
+# Expose Redis port
+EXPOSE 6379
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh
+
+# Use tini as init system
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+CMD ["redis-server", "/etc/redis/redis.conf"]

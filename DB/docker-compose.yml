@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: igem-stock-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.db
+    environment:
+      # Configurações principais
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+      
+      # Configurações de inicialização
+      POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS}
+      POSTGRES_INITDB_WALDIR: ${POSTGRES_INITDB_WALDIR}
+      
+      # Timezone
+      TZ: ${POSTGRES_TIMEZONE}
+      
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      # Dados persistentes
+      - postgres_data:/var/lib/postgresql/data
+      
+      # Backups
+      - postgres_backups:/var/lib/postgresql/backups
+      
+      # Logs
+      - postgres_logs:/var/lib/postgresql/data/log
+      
+      # Scripts customizados (opcional)
+      - ./scripts:/scripts:ro
+      
+    networks:
+      - postgres_network
+    
+    # Health check
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Configurações de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # pgAdmin para administração
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: igem-stock-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@igem.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres_network
+
+  # Backup automático (opcional)
+  postgres-backup:
+    image: postgres:15-alpine
+    container_name: igem-stock-backup
+    restart: unless-stopped
+    env_file:
+      - .env.db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_RETENTION_DAYS: ${POSTGRES_BACKUP_RETENTION_DAYS}
+    volumes:
+      - postgres_backups:/backups
+      - ./backup-scripts:/scripts:ro
+    command: >
+      sh -c "
+        echo 'Iniciando serviço de backup...'
+        while true; do
+          echo 'Executando backup em: $$(date)'
+          pg_dump -h postgres -U $$POSTGRES_USER -d $$POSTGRES_DB > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+          
+          echo 'Limpando backups antigos...'
+          find /backups -name '*.sql' -mtime +$$BACKUP_RETENTION_DAYS -delete
+          
+          echo 'Próximo backup em 24h'
+          sleep 86400
+        done
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres_network
+
+volumes:
+  postgres_data:
+    driver: local
+  postgres_backups:
+    driver: local
+  postgres_logs:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  postgres_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

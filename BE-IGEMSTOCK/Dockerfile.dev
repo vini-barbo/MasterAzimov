@@ -1,0 +1,35 @@
+# Dockerfile para desenvolvimento
+FROM node:22-alpine
+
+# Instalar dependências do sistema
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    bash \
+    curl
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de configuração do package manager
+COPY package*.json ./
+COPY yarn.lock* ./
+
+# Instalar dependências
+RUN npm install
+
+# Instalar Prisma CLI globalmente
+RUN npm install -g prisma
+
+# Copiar código fonte
+COPY . .
+
+# Gerar cliente Prisma
+RUN npx prisma generate
+
+# Expor porta
+EXPOSE 3000
+
+# Comando para desenvolvimento com hot reload
+CMD ["npm", "run", "start:dev"]
