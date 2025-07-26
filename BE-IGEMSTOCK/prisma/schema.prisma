@@ -20,12 +20,12 @@ model User {
   lastName  String?
   role      UserRole @default(USER)
   isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Audit fields
-  createdBy String?
-  updatedBy String?
+  createdBy String? @map("created_by")
+  updatedBy String? @map("updated_by")
 
   @@map("users")
 }
@@ -35,69 +35,381 @@ enum UserRole {
   ADMIN
   USER
   MODERATOR
+
+  @@map("user_role")
 }
 
-// Stock item model
+// ===== INVENTORY SERVICE MODELS =====
+
+// Registered products catalog
+model Product {
+  id          Int      @id @default(autoincrement())
+  sku         String   @unique @db.VarChar(50) // stock keeping unit
+  name        String   @db.VarChar(255) // product name
+  description String?  @db.Text // product description
+  unitCost    Decimal  @map("unit_cost") @db.Decimal(12, 2) // standard unit cost
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  batches        Batch[]
+  stockMovements StockMovement[]
+  saleItems      SaleItem[]
+  notificationRules NotificationRule[]
+  notificationsLog  NotificationLog[]
+  
+  // Purchase order relations
+  purchaseOrderItems PurchaseOrderItem[]
+  
+  // Recipe relations
+  recipe Recipe? // Product can have one recipe (as final product)
+  recipeIngredients RecipeIngredient[] @relation("RecipeIngredients") // Product can be ingredient in multiple recipes
+
+  @@map("products")
+}
+
+// Physical storage locations
+model Warehouse {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100) // warehouse name
+  location  String?  @db.VarChar(255) // human-readable address or description
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  batches        Batch[]
+  stockMovements StockMovement[]
+  notificationRules NotificationRule[]
+  notificationsLog  NotificationLog[]
+
+  @@map("warehouses")
+}
+
+// Batch control for perishable items (lot tracking)
+model Batch {
+  id          Int       @id @default(autoincrement())
+  productId   Int       @map("product_id")
+  warehouseId Int       @map("warehouse_id")
+  batchCode   String    @map("batch_code") @db.VarChar(100) // batch or lot code
+  quantity    Int       @default(0) // current quantity in batch
+  expiryDate  DateTime? @map("expiry_date") @db.Date // expiration date for perishable goods
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  product    Product @relation(fields: [productId], references: [id])
+  warehouse  Warehouse @relation(fields: [warehouseId], references: [id])
+  stockMovements StockMovement[]
+  notificationsLog NotificationLog[]
+
+  @@unique([productId, warehouseId, batchCode])
+  @@map("batches")
+}
+
+// Records every stock IN/OUT/ADJ transaction
+model StockMovement {
+  id           Int              @id @default(autoincrement())
+  productId    Int              @map("product_id")
+  warehouseId  Int              @map("warehouse_id")
+  batchId      Int?             @map("batch_id") // optional batch linkage
+  movementType StockMovementType @map("movement_type") // 'IN', 'OUT' or 'ADJ' (adjustment)
+  quantity     Int              // movement amount (must be positive)
+  relatedId    Int?             @map("related_id") // e.g. sale_id or purchase_id
+  notes        String?          @db.Text // additional info
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  product   Product    @relation(fields: [productId], references: [id])
+  warehouse Warehouse  @relation(fields: [warehouseId], references: [id])
+  batch     Batch?     @relation(fields: [batchId], references: [id])
+
+  @@map("stock_movements")
+}
+
+// Enum for stock movement types
+enum StockMovementType {
+  IN  // Stock in
+  OUT // Stock out
+  ADJ // Adjustment
+
+  @@map("stock_movement_type")
+}
+
+// ===== NOTIFICATION SERVICE MODELS =====
+
+// Defines alert thresholds and expiry warnings
+model NotificationRule {
+  id                Int                    @id @default(autoincrement())
+  ruleType          NotificationRuleType   @map("rule_type") // 'LOW_STOCK' or 'EXPIRY'
+  productId         Int?                   @map("product_id") // optional product-specific
+  warehouseId       Int?                   @map("warehouse_id") // optional warehouse-specific
+  threshold         Int?                   // minimum quantity for LOW_STOCK
+  daysBeforeExpiry  Int?                   @map("days_before_expiry") // warning lead time for EXPIRY
+  createdAt         DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  product          Product?          @relation(fields: [productId], references: [id])
+  warehouse        Warehouse?        @relation(fields: [warehouseId], references: [id])
+  notificationsLog NotificationLog[]
+
+  @@map("notification_rules")
+}
+
+// Enum for notification rule types
+enum NotificationRuleType {
+  LOW_STOCK // Low stock alert
+  EXPIRY    // Expiry warning
+
+  @@map("notification_rule_type")
+}
+
+// History of all notifications sent
+model NotificationLog {
+  id           Int                     @id @default(autoincrement())
+  ruleId       Int?                    @map("rule_id")
+  productId    Int?                    @map("product_id")
+  warehouseId  Int?                    @map("warehouse_id")
+  batchId      Int?                    @map("batch_id")
+  triggeredAt  DateTime                @default(now()) @map("triggered_at") @db.Timestamptz(6)
+  status       NotificationStatus      // 'PENDING','SENT','FAILED'
+  channel      NotificationChannel     // 'EMAIL','SMS','PUSH'
+  payload      Json?                   @db.JsonB // notification payload details
+  errorMsg     String?                 @map("error_msg") @db.Text // error message if send failed
+
+  // Relations
+  rule      NotificationRule? @relation(fields: [ruleId], references: [id])
+  product   Product?          @relation(fields: [productId], references: [id])
+  warehouse Warehouse?        @relation(fields: [warehouseId], references: [id])
+  batch     Batch?            @relation(fields: [batchId], references: [id])
+
+  @@map("notifications_log")
+}
+
+// Enum for notification status
+enum NotificationStatus {
+  PENDING // Notification pending
+  SENT    // Notification sent
+  FAILED  // Notification failed
+
+  @@map("notification_status")
+}
+
+// Enum for notification channel
+enum NotificationChannel {
+  EMAIL // Email notification
+  SMS   // SMS notification
+  PUSH  // Push notification
+
+  @@map("notification_channel")
+}
+
+// ===== DASHBOARD SERVICE MODELS =====
+
+// High-level sales records
+model Sale {
+  id          Int      @id @default(autoincrement())
+  saleDate    DateTime @map("sale_date") @db.Timestamptz(6) // date/time of sale
+  totalAmount Decimal  @map("total_amount") @db.Decimal(12, 2) // total sale value
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  saleItems SaleItem[]
+
+  @@map("sales")
+}
+
+// Individual items sold in each sale
+model SaleItem {
+  id        Int     @id @default(autoincrement())
+  saleId    Int     @map("sale_id")
+  productId Int     @map("product_id")
+  quantity  Int     // units sold (must be positive)
+  unitPrice Decimal @map("unit_price") @db.Decimal(12, 2) // sale price per unit
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  sale    Sale    @relation(fields: [saleId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("sale_items")
+}
+
+// ===== PURCHASE ORDER SERVICE MODELS =====
+
+// Suppliers catalog
+model Supplier {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  contactEmail String?  @map("contact_email") @db.VarChar(255)
+  phone        String?  @db.VarChar(20)
+  address      String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  purchaseOrders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+// Purchase orders header
+model PurchaseOrder {
+  id         Int                   @id @default(autoincrement())
+  supplierId Int                   @map("supplier_id")
+  orderDate  DateTime              @map("order_date") @db.Date
+  status     PurchaseOrderStatus   @default(PENDING)
+  totalAmount Decimal?             @map("total_amount") @db.Decimal(12, 2)
+  createdAt  DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  supplier           Supplier              @relation(fields: [supplierId], references: [id])
+  purchaseOrderItems PurchaseOrderItem[]
+
+  @@map("purchase_orders")
+}
+
+// Purchase order items/lines
+model PurchaseOrderItem {
+  id                Int     @id @default(autoincrement())
+  purchaseOrderId   Int     @map("purchase_order_id")
+  productId         Int     @map("product_id")
+  quantity          Int
+  unitPrice         Decimal @map("unit_price") @db.Decimal(12, 2)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  product       Product       @relation(fields: [productId], references: [id])
+
+  @@map("purchase_order_items")
+}
+
+// Enum for purchase order status
+enum PurchaseOrderStatus {
+  PENDING   // Order created but not received
+  RECEIVED  // Order received and stock updated
+  CANCELLED // Order cancelled
+
+  @@map("purchase_order_status")
+}
+
+// ===== PRODUCTION SERVICE MODELS =====
+
+// Recipes for production (defines how to make a product)
+model Recipe {
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id") @unique // final product
+  name      String   @db.VarChar(255)
+  notes     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  product           Product             @relation(fields: [productId], references: [id])
+  recipeIngredients RecipeIngredient[]
+  productionBatches ProductionBatch[]
+
+  @@map("recipes")
+}
+
+// Ingredients needed for each recipe
+model RecipeIngredient {
+  id           Int     @id @default(autoincrement())
+  recipeId     Int     @map("recipe_id")
+  ingredientId Int     @map("ingredient_id") // product used as ingredient
+  quantity     Decimal @db.Decimal(10, 2)   // quantity needed per unit produced
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  recipe     Recipe  @relation(fields: [recipeId], references: [id])
+  ingredient Product @relation("RecipeIngredients", fields: [ingredientId], references: [id])
+
+  @@unique([recipeId, ingredientId])
+  @@map("recipe_ingredients")
+}
+
+// Production batches (record of production runs)
+model ProductionBatch {
+  id               Int      @id @default(autoincrement())
+  recipeId         Int      @map("recipe_id")
+  quantityProduced Int      @map("quantity_produced")
+  productionDate   DateTime @map("production_date") @default(now()) @db.Timestamptz(6)
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+
+  @@map("production_batches")
+}
+
+// ===== LEGACY MODELS (for backward compatibility) =====
+
+// Stock item model (legacy - keeping for compatibility)
 model StockItem {
   id          String   @id @default(cuid())
   name        String
   description String?
   sku         String   @unique
   quantity    Int      @default(0)
-  minQuantity Int      @default(0)
-  maxQuantity Int?
-  unitPrice   Decimal? @db.Decimal(10, 2)
+  minQuantity Int      @default(0) @map("min_quantity")
+  maxQuantity Int?     @map("max_quantity")
+  unitPrice   Decimal? @map("unit_price") @db.Decimal(10, 2)
   category    String?
   location    String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  movements StockMovement[]
+  movements LegacyStockMovement[]
 
   // Audit fields
-  createdBy String?
-  updatedBy String?
+  createdBy String? @map("created_by")
+  updatedBy String? @map("updated_by")
 
   @@map("stock_items")
 }
 
-// Stock movement model for tracking inventory changes
-model StockMovement {
-  id          String         @id @default(cuid())
-  stockItemId String
-  type        MovementType
+// Stock movement model for tracking inventory changes (legacy)
+model LegacyStockMovement {
+  id          String                @id @default(cuid())
+  stockItemId String                @map("stock_item_id")
+  type        LegacyMovementType
   quantity    Int
   reason      String?
   notes       String?
-  createdAt   DateTime       @default(now())
-  createdBy   String?
+  createdAt   DateTime              @default(now()) @map("created_at")
+  createdBy   String?               @map("created_by")
 
   // Relations
   stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
 
-  @@map("stock_movements")
+  @@map("legacy_stock_movements")
 }
 
-// Enum for movement types
-enum MovementType {
+// Enum for movement types (legacy)
+enum LegacyMovementType {
   IN
   OUT
   ADJUSTMENT
   TRANSFER
+
+  @@map("legacy_movement_type")
 }
 
 // Audit log model for tracking all changes
 model AuditLog {
   id        String   @id @default(cuid())
-  tableName String
-  recordId  String
+  tableName String   @map("table_name")
+  recordId  String   @map("record_id")
   action    String   // INSERT, UPDATE, DELETE
-  oldData   Json?
-  newData   Json?
-  userId    String?
-  createdAt DateTime @default(now())
+  oldData   Json?    @map("old_data")
+  newData   Json?    @map("new_data")
+  userId    String?  @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("audit_logs")
 }

@@ -7,7 +7,7 @@ export class HealthController {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly redisService: RedisService,
-  ) { }
+  ) {}
 
   @Get()
   async check() {

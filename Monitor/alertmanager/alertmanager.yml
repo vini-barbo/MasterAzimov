@@ -1,49 +1,13 @@
 global:
   smtp_smarthost: 'localhost:587'
   smtp_from: 'alerts@masterazimov.com'
-  smtp_auth_username: 'alerts@masterazimov.com'
-  smtp_auth_password: 'your-email-password'
 
 route:
   group_by: ['alertname']
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 1h
-  receiver: 'web.hook'
+  receiver: 'default-receiver'
 
 receivers:
-  - name: 'web.hook'
-    email_configs:
-      - to: 'admin@masterazimov.com'
-        subject: '[AZIMOV ALERT] {{ .GroupLabels.alertname }}'
-        body: |
-          {{ range .Alerts }}
-          Alert: {{ .Annotations.summary }}
-          Description: {{ .Annotations.description }}
-          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}: {{ .Value }}{{ end }}
-          {{ end }}
-    
-    webhook_configs:
-      - url: 'http://localhost:5001/webhook'
-        send_resolved: true
-        http_config:
-          basic_auth:
-            username: 'azimov'
-            password: 'webhook-secret'
-
-    slack_configs:
-      - api_url: 'YOUR_SLACK_WEBHOOK_URL'
-        channel: '#alerts'
-        title: 'Master Azimov Alert'
-        text: |
-          {{ range .Alerts }}
-          Alert: {{ .Annotations.summary }}
-          Description: {{ .Annotations.description }}
-          {{ end }}
-
-inhibit_rules:
-  - source_match:
-      severity: 'critical'
-    target_match:
-      severity: 'warning'
-    equal: ['alertname', 'dev', 'instance']
+  - name: 'default-receiver'

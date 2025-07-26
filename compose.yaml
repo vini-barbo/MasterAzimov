@@ -88,163 +88,62 @@ services:
       start_period: 40s
     restart: unless-stopped
 
-  # Prometheus - Coleta de métricas
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: igem-prometheus-dev
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./Monitor/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./Monitor/prometheus/rules:/etc/prometheus/rules:ro
-      - prometheus_data_dev:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=72h'
-      - '--web.enable-lifecycle'
-    networks:
-      - igem-network
-    restart: unless-stopped
-
-  # Grafana - Visualização de métricas
-  grafana:
-    image: grafana/grafana:latest
-    container_name: igem-grafana-dev
-    ports:
-      - "3030:3000"
-    volumes:
-      - grafana_data_dev:/var/lib/grafana
-      - ./Monitor/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./Monitor/grafana/dashboards:/var/lib/grafana/dashboards:ro
+  # pgAdmin - Interface web para PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: igem-pgadmin-dev
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SECURITY_ALLOW_EMBEDDING=true
-    networks:
-      - igem-network
-    restart: unless-stopped
-
-  # Node Exporter - Métricas do sistema
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: igem-node-exporter-dev
+      PGADMIN_DEFAULT_EMAIL: admin@igemstock.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
-      - "9100:9100"
+      - "5050:80"
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - pgadmin_data_dev:/var/lib/pgadmin
+      - ./DB/pgadmin/servers.json:/pgadmin4/servers.json:ro
     networks:
       - igem-network
-    restart: unless-stopped
-
-  # cAdvisor - Métricas de containers
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: igem-cadvisor-dev
-    ports:
-      - "8080:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-    privileged: true
-    devices:
-      - /dev/kmsg
-    networks:
-      - igem-network
-    restart: unless-stopped
-
-  # Elasticsearch - Armazenamento de logs (versão dev - recursos reduzidos)
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    container_name: igem-elasticsearch-dev
-    environment:
-      - node.name=elasticsearch
-      - cluster.name=igem-cluster-dev
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=false
-      - xpack.security.enrollment.enabled=false
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - elasticsearch_data_dev:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    networks:
-      - igem-network
-    restart: unless-stopped
-
-  # Kibana - Visualização de logs
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.11.0
-    container_name: igem-kibana-dev
-    ports:
-      - "5601:5601"
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      ELASTICSEARCH_USERNAME: ""
-      ELASTICSEARCH_PASSWORD: ""
     depends_on:
-      - elasticsearch
-    networks:
-      - igem-network
+      database:
+        condition: service_healthy
     restart: unless-stopped
 
-  # Logstash - Processamento de logs (opcional em dev)
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.11.0
-    container_name: igem-logstash-dev
+  # RedisInsight - Interface web para Redis
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: igem-redisinsight-dev
     ports:
-      - "5044:5044"
-      - "5000:5000/tcp"
-      - "9600:9600"
+      - "8001:8001"
     volumes:
-      - ./Monitor/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./Monitor/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - redisinsight_data_dev:/db
     environment:
-      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
-    depends_on:
-      - elasticsearch
+      - RIPORT=8001
+      - RITRUSTEDORIGINS=http://localhost:8001
     networks:
       - igem-network
-    restart: unless-stopped
-    profiles:
-      - full-monitoring
-
-  # Filebeat - Coleta de logs
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:8.11.0
-    container_name: igem-filebeat-dev
-    user: root
-    volumes:
-      - ./Monitor/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - filebeat_data_dev:/usr/share/filebeat/data
-    environment:
-      - output.elasticsearch.hosts=["elasticsearch:9200"]
     depends_on:
-      - elasticsearch
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Adminer - Interface web alternativa para banco de dados (leve)
+  adminer:
+    image: adminer:latest
+    container_name: igem-adminer-dev
+    ports:
+      - "8081:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=database
+      - ADMINER_DESIGN=pepa-linha
     networks:
       - igem-network
+    depends_on:
+      database:
+        condition: service_healthy
     restart: unless-stopped
-    profiles:
-      - full-monitoring
 
+ 
 volumes:
   postgres_data_dev:
     driver: local
@@ -256,14 +155,11 @@ volumes:
     driver: local
   redis_run_dev:
     driver: local
-  prometheus_data_dev:
+  pgadmin_data_dev:
     driver: local
-  grafana_data_dev:
+  redisinsight_data_dev:
     driver: local
-  elasticsearch_data_dev:
-    driver: local
-  filebeat_data_dev:
-    driver: local
+ 
 
 networks:
   igem-network:

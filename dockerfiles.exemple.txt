@@ -1,0 +1,348 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  database:
+    build:
+      context: ./DB
+      dockerfile: Dockerfile
+    container_name: igem-stock-db-dev
+    environment:
+      POSTGRES_DB: igem_stock_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - postgres_backups_dev:/var/lib/postgresql/backups
+      - ./DB/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - igem-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d igem_stock_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Redis para cache e filas
+  redis:
+    build:
+      context: ./CA
+      dockerfile: Dockerfile
+    container_name: igem-stock-redis-dev
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_MAXMEMORY=${REDIS_MAXMEMORY:-256mb}
+      - REDIS_MAXMEMORY_POLICY=${REDIS_MAXMEMORY_POLICY:-allkeys-lru}
+    volumes:
+      - redis_data_dev:/data
+      - redis_logs_dev:/var/log/redis
+      - redis_run_dev:/var/run/redis
+      - ./CA/config/redis.conf:/etc/redis/redis.conf:ro
+      - ./CA/scripts:/usr/local/bin/scripts:ro
+    networks:
+      - igem-network
+    # Remove the command override to let entrypoint handle config
+    # command: ["redis-server", "/etc/redis/redis.conf"]
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Backend NestJS
+  backend:
+    build:
+      context: ./BE-IGEMSTOCK
+      dockerfile: Dockerfile.dev
+    container_name: igem-stock-backend-dev
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres123@database:5432/igem_stock_dev?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_jwt_secret_key_change_in_production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./BE-IGEMSTOCK:/app
+      - /app/node_modules
+    networks:
+      - igem-network
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # pgAdmin - Interface web para PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: igem-pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@igemstock.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data_dev:/var/lib/pgadmin
+      - ./DB/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - igem-network
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # RedisInsight - Interface web para Redis
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: igem-redisinsight-dev
+    ports:
+      - "8001:8001"
+    volumes:
+      - redisinsight_data_dev:/db
+    environment:
+      - RIPORT=8001
+      - RITRUSTEDORIGINS=http://localhost:8001
+    networks:
+      - igem-network
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Adminer - Interface web alternativa para banco de dados (leve)
+  adminer:
+    image: adminer:latest
+    container_name: igem-adminer-dev
+    ports:
+      - "8080:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=database
+      - ADMINER_DESIGN=pepa-linha
+    networks:
+      - igem-network
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # # Prometheus - Coleta de métricas
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: igem-prometheus-dev
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./Monitor/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #     - ./Monitor/prometheus/rules:/etc/prometheus/rules:ro
+  #     - prometheus_data_dev:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--storage.tsdb.retention.time=72h'
+  #     - '--web.enable-lifecycle'
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+
+  # # Alertmanager - Gerenciamento de alertas
+  # alertmanager:
+  #   image: prom/alertmanager:latest
+  #   container_name: igem-alertmanager-dev
+  #   ports:
+  #     - "9093:9093"
+  #   volumes:
+  #     - ./Monitor/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+  #     - alertmanager_data_dev:/alertmanager
+  #   command:
+  #     - '--config.file=/etc/alertmanager/alertmanager.yml'
+  #     - '--storage.path=/alertmanager'
+  #     - '--web.external-url=http://localhost:9093'
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+
+  # # Grafana - Visualização de métricas
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: igem-grafana-dev
+  #   ports:
+  #     - "3030:3000"
+  #   volumes:
+  #     - grafana_data_dev:/var/lib/grafana
+  #     - ./Monitor/grafana/provisioning:/etc/grafana/provisioning:ro
+  #     - ./Monitor/grafana/dashboards:/var/lib/grafana/dashboards:ro
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin123
+  #     - GF_USERS_ALLOW_SIGN_UP=false
+  #     - GF_SECURITY_ALLOW_EMBEDDING=true
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+
+  # # Node Exporter - Métricas do sistema
+  # node-exporter:
+  #   image: prom/node-exporter:latest
+  #   container_name: igem-node-exporter-dev
+  #   ports:
+  #     - "9100:9100"
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   command:
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.rootfs=/rootfs'
+  #     - '--path.sysfs=/host/sys'
+  #     - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+
+  # # cAdvisor - Métricas de containers
+  # cadvisor:
+  #   image: gcr.io/cadvisor/cadvisor:latest
+  #   container_name: igem-cadvisor-dev
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:ro
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #     - /dev/disk/:/dev/disk:ro
+  #   privileged: true
+  #   devices:
+  #     - /dev/kmsg
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+
+  # # Elasticsearch - Armazenamento de logs (versão dev - recursos reduzidos)
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+  #   container_name: igem-elasticsearch-dev
+  #   environment:
+  #     - node.name=elasticsearch
+  #     - cluster.name=igem-cluster-dev
+  #     - discovery.type=single-node
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - xpack.security.enabled=false
+  #     - xpack.security.enrollment.enabled=false
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - elasticsearch_data_dev:/usr/share/elasticsearch/data
+  #   ports:
+  #     - "9200:9200"
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+
+  # # Kibana - Visualização de logs
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.11.0
+  #   container_name: igem-kibana-dev
+  #   ports:
+  #     - "5601:5601"
+  #   environment:
+  #     ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+  #     ELASTICSEARCH_USERNAME: ""
+  #     ELASTICSEARCH_PASSWORD: ""
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+
+  # # Logstash - Processamento de logs (opcional em dev)
+  # logstash:
+  #   image: docker.elastic.co/logstash/logstash:8.11.0
+  #   container_name: igem-logstash-dev
+  #   ports:
+  #     - "5044:5044"
+  #     - "5000:5000/tcp"
+  #     - "9600:9600"
+  #   volumes:
+  #     - ./Monitor/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+  #     - ./Monitor/logstash/pipeline:/usr/share/logstash/pipeline:ro
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+  #   profiles:
+  #     - full-monitoring
+
+  # # Filebeat - Coleta de logs
+  # filebeat:
+  #   image: docker.elastic.co/beats/filebeat:8.11.0
+  #   container_name: igem-filebeat-dev
+  #   user: root
+  #   volumes:
+  #     - ./Monitor/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - filebeat_data_dev:/usr/share/filebeat/data
+  #   environment:
+  #     - output.elasticsearch.hosts=["elasticsearch:9200"]
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - igem-network
+  #   restart: unless-stopped
+  #   profiles:
+  #     - full-monitoring
+
+volumes:
+  postgres_data_dev:
+    driver: local
+  postgres_backups_dev:
+    driver: local
+  redis_data_dev:
+    driver: local
+  redis_logs_dev:
+    driver: local
+  redis_run_dev:
+    driver: local
+  pgadmin_data_dev:
+    driver: local
+  redisinsight_data_dev:
+    driver: local
+  prometheus_data_dev:
+    driver: local
+  alertmanager_data_dev:
+    driver: local
+  grafana_data_dev:
+    driver: local
+  elasticsearch_data_dev:
+    driver: local
+  filebeat_data_dev:
+    driver: local
+
+networks:
+  igem-network:
+    driver: bridge

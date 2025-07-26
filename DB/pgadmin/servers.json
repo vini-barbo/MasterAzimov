@@ -1,11 +1,11 @@
 {
   "Servers": {
     "1": {
-      "Name": "IGEM Stock Database",
-      "Group": "Servers",
-      "Host": "postgres",
+      "Name": "IGEM Stock Development",
+      "Group": "Development",
+      "Host": "database",
       "Port": 5432,
-      "MaintenanceDB": "igem_stock",
+      "MaintenanceDB": "igem_stock_dev",
       "Username": "postgres",
       "SSLMode": "prefer",
       "SSLCert": "<STORAGE_DIR>/.postgresql/postgresql.crt",
@@ -21,9 +21,9 @@
     "2": {
       "Name": "IGEM Stock (App User)",
       "Group": "Application",
-      "Host": "postgres",
+      "Host": "database",
       "Port": 5432,
-      "MaintenanceDB": "igem_stock",
+      "MaintenanceDB": "igem_stock_dev",
       "Username": "igem_app",
       "SSLMode": "prefer",
       "SSLCert": "<STORAGE_DIR>/.postgresql/postgresql.crt",
@@ -39,9 +39,9 @@
     "3": {
       "Name": "IGEM Stock (ReadOnly)",
       "Group": "Application",
-      "Host": "postgres",
+      "Host": "database",
       "Port": 5432,
-      "MaintenanceDB": "igem_stock",
+      "MaintenanceDB": "igem_stock_dev",
       "Username": "igem_readonly",
       "SSLMode": "prefer",
       "SSLCert": "<STORAGE_DIR>/.postgresql/postgresql.crt",

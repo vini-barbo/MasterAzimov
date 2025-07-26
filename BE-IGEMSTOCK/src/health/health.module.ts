@@ -6,4 +6,4 @@ import { RedisModule } from 'src/redis/redis.module';
   imports: [RedisModule],
   controllers: [HealthController],
 })
-export class HealthModule { }
+export class HealthModule {}
