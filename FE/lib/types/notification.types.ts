@@ -77,3 +77,75 @@ export interface NotificationRuleResponse extends NotificationRule {
 export interface NotificationLogResponse extends NotificationLog {
   // Additional fields that might come from the API
 }
+
+// New notification interfaces for frontend notifications
+export interface Notification {
+  id: string
+  type: 'low_stock' | 'expiring_soon' | 'stock_out' | 'system' | 'production' | 'purchase' | 'sale'
+  title?: string
+  product_name?: string
+  sku?: string
+  message: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  status: 'unread' | 'read' | 'archived'
+  created_at: string
+  read_at?: string
+  
+  // Related entities
+  product_id?: string
+  warehouse_id?: string
+  warehouse?: string
+  batch_id?: string
+  user_id?: string
+  
+  // Additional metadata
+  metadata?: {
+    current_stock?: number
+    min_stock?: number
+    expiry_date?: string
+    action_required?: boolean
+    priority?: number
+  }
+}
+
+export interface NotificationSummary {
+  total_count: number
+  unread_count: number
+  critical_count: number
+  high_priority_count: number
+  types: {
+    low_stock: number
+    expiring_soon: number
+    stock_out: number
+    system: number
+    production: number
+    purchase: number
+    sale: number
+  }
+}
+
+export interface CreateNotificationDto {
+  type: Notification['type']
+  title?: string
+  message: string
+  severity: Notification['severity']
+  product_id?: string
+  warehouse_id?: string
+  batch_id?: string
+  metadata?: Notification['metadata']
+}
+
+export interface UpdateNotificationDto {
+  status?: Notification['status']
+  read_at?: string
+}
+
+export interface NotificationFilters {
+  status?: 'unread' | 'read' | 'archived'
+  type?: Notification['type']
+  severity?: Notification['severity']
+  product_id?: string
+  warehouse_id?: string
+  date_from?: string
+  date_to?: string
+}

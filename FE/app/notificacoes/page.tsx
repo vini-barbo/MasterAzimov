@@ -8,68 +8,12 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { NotificationsPageSkeleton } from "@/components/skeletons/notifications-skeleton"
 import { useApi } from "@/hooks/use-api"
 import { useI18n } from "@/lib/i18n"
-
-// Simulando dados da tabela notifications_log
-const notifications = [
-  {
-    id: 1,
-    type: "low_stock",
-    product_name: "Pão de Hambúrguer",
-    sku: "PAO002",
-    message: "Estoque abaixo do mínimo (12/30 pacotes)",
-    severity: "high",
-    created_at: "2024-01-15T10:30:00Z",
-    warehouse: "Estoque Seco",
-  },
-  {
-    id: 2,
-    type: "expiring_soon",
-    product_name: "Queijo Cheddar",
-    sku: "QUE003",
-    message: "Produto vence em 2 dias (Lote: QUE-240115)",
-    severity: "critical",
-    created_at: "2024-01-15T09:15:00Z",
-    warehouse: "Refrigerador A",
-  },
-  {
-    id: 3,
-    type: "low_stock",
-    product_name: "Tomate Salada",
-    sku: "TOM006",
-    message: "Estoque crítico (5/12 kg)",
-    severity: "critical",
-    created_at: "2024-01-15T08:45:00Z",
-    warehouse: "Refrigerador B",
-  },
-  {
-    id: 4,
-    type: "expiring_soon",
-    product_name: "Alface Americana",
-    sku: "ALC005",
-    message: "Produto vence em 1 dia (Lote: ALC-240114)",
-    severity: "critical",
-    created_at: "2024-01-14T16:20:00Z",
-    warehouse: "Refrigerador B",
-  },
-  {
-    id: 5,
-    type: "low_stock",
-    product_name: "Queijo Cheddar",
-    sku: "QUE003",
-    message: "Estoque baixo (8/15 kg)",
-    severity: "medium",
-    created_at: "2024-01-14T14:10:00Z",
-    warehouse: "Refrigerador A",
-  },
-]
-
-async function fetchNotifications() {
-  return notifications
-}
+import { notificationsApi } from "@/lib/dashboard-stock-notifications-api"
 
 function getNotificationIcon(type: string) {
   switch (type) {
     case "low_stock":
+    case "stock_out":
       return Package
     case "expiring_soon":
       return Clock
@@ -102,14 +46,22 @@ function formatDate(dateString: string) {
 }
 
 export default function NotificacoesPage() {
-  const { data, loading, error, refetch } = useApi(fetchNotifications)
+  const { data: notifications, loading: notificationsLoading, error, refetch: refetchNotifications } = useApi(() => notificationsApi.getAll())
+  const { data: summary, loading: summaryLoading, refetch: refetchSummary } = useApi(() => notificationsApi.getSummary())
   const { t } = useI18n()
+
+  const loading = notificationsLoading || summaryLoading
+
+  const refetch = () => {
+    refetchNotifications()
+    refetchSummary()
+  }
 
   if (loading) {
     return <NotificationsPageSkeleton />
   }
 
-  if (!data) {
+  if (!notifications || !summary) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-center space-y-4">
@@ -126,10 +78,6 @@ export default function NotificacoesPage() {
       </div>
     )
   }
-
-  const criticalAlerts = data.filter((n) => n.severity === "critical").length
-  const highAlerts = data.filter((n) => n.severity === "high").length
-  const totalAlerts = data.length
 
   return (
     <div className="flex-1 space-y-4 p-3 md:p-8 pt-4 md:pt-6">
@@ -154,7 +102,7 @@ export default function NotificacoesPage() {
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalAlerts}</div>
+            <div className="text-2xl font-bold">{summary.total_count}</div>
             <p className="text-xs text-muted-foreground">{t("notifications.activeAlerts")}</p>
           </CardContent>
         </Card>
@@ -165,7 +113,7 @@ export default function NotificacoesPage() {
             <AlertTriangle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{criticalAlerts}</div>
+            <div className="text-2xl font-bold text-red-600">{summary.critical_count}</div>
             <p className="text-xs text-muted-foreground">{t("notifications.immediateAction")}</p>
           </CardContent>
         </Card>
@@ -176,7 +124,7 @@ export default function NotificacoesPage() {
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{highAlerts}</div>
+            <div className="text-2xl font-bold text-yellow-600">{summary.high_priority_count}</div>
             <p className="text-xs text-muted-foreground">{t("notifications.attentionNeeded")}</p>
           </CardContent>
         </Card>
@@ -198,7 +146,7 @@ export default function NotificacoesPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3 md:space-y-4">
-            {data.map((notification) => {
+            {notifications.map((notification) => {
               const Icon = getNotificationIcon(notification.type)
               const severityColor = getSeverityColor(notification.severity)
 
@@ -221,7 +169,9 @@ export default function NotificacoesPage() {
 
                   <div className="flex-1 space-y-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <h4 className="font-medium text-sm md:text-base truncate">{notification.product_name}</h4>
+                      <h4 className="font-medium text-sm md:text-base truncate">
+                        {notification.title || notification.product_name || 'Notificação'}
+                      </h4>
                       <Badge variant={severityColor as any} className="flex-shrink-0">
                         {notification.severity === "critical"
                           ? t("severity.critical")
@@ -231,9 +181,11 @@ export default function NotificacoesPage() {
                       </Badge>
                     </div>
 
-                    <p className="text-xs md:text-sm text-muted-foreground">
-                      SKU: {notification.sku} • {notification.warehouse}
-                    </p>
+                    {notification.sku && notification.warehouse && (
+                      <p className="text-xs md:text-sm text-muted-foreground">
+                        SKU: {notification.sku} • {notification.warehouse}
+                      </p>
+                    )}
 
                     <p className="text-sm">{notification.message}</p>
 

@@ -10,68 +10,7 @@ import { DashboardPageSkeleton } from "@/components/skeletons/dashboard-skeleton
 import { useApi } from "@/hooks/use-api"
 import { AlertTriangle } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
-
-// Simulando dados da view vw_top_selling_products
-const topSellingProducts = [
-  {
-    rank: 1,
-    sku: "HAM001",
-    product_name: "Hambúrguer Artesanal",
-    total_quantity_sold: 1250,
-    total_revenue: 31250.0,
-    avg_price: 25.0,
-    sales_trend: "up",
-  },
-  {
-    rank: 2,
-    sku: "CAR004",
-    product_name: "Carne Bovina 180g",
-    total_quantity_sold: 980,
-    total_revenue: 19600.0,
-    avg_price: 20.0,
-    sales_trend: "up",
-  },
-  {
-    rank: 3,
-    sku: "PAO002",
-    product_name: "Pão de Hambúrguer",
-    total_quantity_sold: 850,
-    total_revenue: 4250.0,
-    avg_price: 5.0,
-    sales_trend: "stable",
-  },
-  {
-    rank: 4,
-    sku: "QUE003",
-    product_name: "Queijo Cheddar",
-    total_revenue: 12750.0,
-    total_quantity_sold: 425,
-    avg_price: 30.0,
-    sales_trend: "down",
-  },
-  {
-    rank: 5,
-    sku: "ALC005",
-    product_name: "Alface Americana",
-    total_quantity_sold: 320,
-    total_revenue: 960.0,
-    avg_price: 3.0,
-    sales_trend: "up",
-  },
-  {
-    rank: 6,
-    sku: "TOM006",
-    product_name: "Tomate Salada",
-    total_quantity_sold: 280,
-    total_revenue: 2240.0,
-    avg_price: 8.0,
-    sales_trend: "stable",
-  },
-]
-
-async function fetchDashboardData() {
-  return topSellingProducts
-}
+import { dashboardApi } from "@/lib/dashboard-stock-notifications-api"
 
 function getTrendIcon(trend: string) {
   switch (trend) {
@@ -92,7 +31,7 @@ function formatCurrency(value: number) {
 }
 
 export default function DashboardPage() {
-  const { data, loading, error, refetch } = useApi(fetchDashboardData)
+  const { data, loading, error, refetch } = useApi(() => dashboardApi.getTopSellingProducts())
   const { t } = useI18n()
 
   if (loading) {
@@ -167,9 +106,9 @@ export default function DashboardPage() {
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold truncate">{topProduct.product_name}</div>
+            <div className="text-lg md:text-2xl font-bold truncate">{topProduct?.product_name || 'N/A'}</div>
             <p className="text-xs text-muted-foreground">
-              {topProduct.total_quantity_sold} {t("dashboard.unitsSoldCount")}
+              {topProduct?.total_quantity_sold || 0} {t("dashboard.unitsSoldCount")}
             </p>
           </CardContent>
         </Card>
@@ -180,7 +119,7 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{formatCurrency(totalRevenue / totalQuantitySold)}</div>
+            <div className="text-lg md:text-2xl font-bold">{formatCurrency(totalRevenue / totalQuantitySold || 0)}</div>
             <p className="text-xs text-muted-foreground">{t("dashboard.averageValue")}</p>
           </CardContent>
         </Card>

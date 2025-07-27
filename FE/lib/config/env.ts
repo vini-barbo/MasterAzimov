@@ -97,6 +97,24 @@ export const API_ENDPOINTS = {
     MARK_ALL_READ: '/notifications/mark-all-read',
   },
 
+  // Dashboard Analytics
+  DASHBOARD: {
+    TOP_SELLING_PRODUCTS: '/dashboard/top-selling-products',
+    SALES_ANALYTICS: '/dashboard/sales-analytics',
+    STOCK_SUMMARY: '/dashboard/stock-summary',
+    PERFORMANCE_METRICS: '/dashboard/performance-metrics',
+  },
+
+  // Stock Management  
+  STOCK: {
+    ON_HAND: '/stock/on-hand',
+    LOW_STOCK: '/stock/low-stock',
+    CRITICAL_STOCK: '/stock/critical',
+    BY_WAREHOUSE: (warehouseId: string) => `/stock/warehouse/${warehouseId}`,
+    BY_PRODUCT: (productId: string) => `/stock/product/${productId}`,
+    SUMMARY: '/stock/summary',
+  },
+
   // Health check
   HEALTH: '/health',
 } as const
