@@ -1,15 +1,14 @@
 import { httpClient } from './http-client'
 import { UserMapper } from '../mappers/user.mapper'
 import { User, CreateUserDto, UpdateUserDto } from '../types/user.types'
+import { API_ENDPOINTS } from '../config/env'
 
 export class UserService {
-  private static readonly BASE_PATH = '/users'
-
   /**
    * Get all users
    */
   static async getAll(): Promise<User[]> {
-    const response = await httpClient.get<any[]>(this.BASE_PATH)
+    const response = await httpClient.get<any[]>(API_ENDPOINTS.USERS.BASE)
     return UserMapper.fromApiResponseArray(response)
   }
 
@@ -17,7 +16,7 @@ export class UserService {
    * Get user by ID
    */
   static async getById(id: string): Promise<User> {
-    const response = await httpClient.get<any>(`${this.BASE_PATH}/${id}`)
+    const response = await httpClient.get<any>(API_ENDPOINTS.USERS.BY_ID(id))
     return UserMapper.fromApiResponse(response)
   }
 
@@ -26,7 +25,7 @@ export class UserService {
    */
   static async create(userData: CreateUserDto): Promise<User> {
     const payload = UserMapper.toApiRequest(userData)
-    const response = await httpClient.post<any>(this.BASE_PATH, payload)
+    const response = await httpClient.post<any>(API_ENDPOINTS.USERS.BASE, payload)
     return UserMapper.fromApiResponse(response)
   }
 
@@ -35,7 +34,7 @@ export class UserService {
    */
   static async update(id: string, userData: UpdateUserDto): Promise<User> {
     const payload = UserMapper.toApiRequest(userData)
-    const response = await httpClient.patch<any>(`${this.BASE_PATH}/${id}`, payload)
+    const response = await httpClient.patch<any>(API_ENDPOINTS.USERS.BY_ID(id), payload)
     return UserMapper.fromApiResponse(response)
   }
 
@@ -43,14 +42,14 @@ export class UserService {
    * Delete user
    */
   static async delete(id: string): Promise<void> {
-    await httpClient.delete(`${this.BASE_PATH}/${id}`)
+    await httpClient.delete(API_ENDPOINTS.USERS.BY_ID(id))
   }
 
   /**
    * Deactivate user
    */
   static async deactivate(id: string): Promise<User> {
-    const response = await httpClient.patch<any>(`${this.BASE_PATH}/${id}/deactivate`)
+    const response = await httpClient.patch<any>(`${API_ENDPOINTS.USERS.BY_ID(id)}/deactivate`)
     return UserMapper.fromApiResponse(response)
   }
 
@@ -58,7 +57,7 @@ export class UserService {
    * Activate user
    */
   static async activate(id: string): Promise<User> {
-    const response = await httpClient.patch<any>(`${this.BASE_PATH}/${id}/activate`)
+    const response = await httpClient.patch<any>(`${API_ENDPOINTS.USERS.BY_ID(id)}/activate`)
     return UserMapper.fromApiResponse(response)
   }
 }

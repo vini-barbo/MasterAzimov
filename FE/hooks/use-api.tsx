@@ -23,19 +23,14 @@ export function useApi<T>(fetchFn: () => Promise<T>, options: UseApiOptions = {}
       setLoading(true)
       setError(null)
 
-      // Simular delay de rede
-      await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000))
-
-      // Simular erro ocasional (10% de chance)
-      if (Math.random() < 0.1) {
-        throw new Error("Erro de conexão com o servidor")
-      }
-
       const result = await fetchFn()
       setData(result)
     } catch (err) {
       const error = err instanceof Error ? err : new Error("Erro desconhecido")
       setError(error)
+
+      // Log the error for debugging
+      console.error("API Error:", error)
 
       toast({
         variant: "destructive",

@@ -15,17 +15,21 @@ export interface PurchaseOrder {
   id: string
   supplier_id: string
   supplier_name: string
-  status: "pending" | "received" | "cancelled"
+  status: "PENDING" | "RECEIVED" | "CANCELLED"
   total_amount: number
+  notes?: string
+  expected_delivery_date?: string
+  received_date?: string
   created_at: string
-  received_at?: string
+  updated_at: string
   items: PurchaseOrderItem[]
 }
 
 export interface PurchaseOrderItem {
   id: string
-  product_sku: string
+  product_id: string
   product_name: string
+  product_sku: string
   quantity: number
   unit_price: number
   total_price: number

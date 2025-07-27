@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,24 +12,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useApi } from "@/hooks/use-api"
 import { suppliersApi, purchaseOrdersApi } from "@/lib/api"
+import { api } from "@/lib/api/index"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import type { PurchaseOrderItem } from "@/lib/types"
 import { useI18n } from "@/lib/i18n"
 
-// Mock products for selection
-const mockProducts = [
-  { sku: "HAM001", name: "Hambúrguer Artesanal", unit: "unidades" },
-  { sku: "PAO002", name: "Pão de Hambúrguer", unit: "pacotes" },
-  { sku: "QUE003", name: "Queijo Cheddar", unit: "kg" },
-  { sku: "CAR004", name: "Carne Bovina 180g", unit: "unidades" },
-  { sku: "ALC005", name: "Alface Americana", unit: "maços" },
-  { sku: "TOM006", name: "Tomate Salada", unit: "kg" },
-]
-
 export default function NovaCompraPage() {
   const { data: suppliers, loading: loadingSuppliers } = useApi(() => suppliersApi.getAll())
+  const { data: productsData, loading: loadingProducts } = useApi(() => api.products.getAll())
+  const products = Array.isArray(productsData) ? productsData : []
   const router = useRouter()
   const { toast } = useToast()
   const { t } = useI18n()
@@ -64,7 +57,7 @@ export default function NovaCompraPage() {
   const updateItem = (index: number, field: string, value: any) => {
     const updatedItems = [...items]
     if (field === "product_sku") {
-      const product = mockProducts.find((p) => p.sku === value)
+      const product = products.find((p: any) => p.sku === value)
       updatedItems[index] = {
         ...updatedItems[index],
         product_sku: value,
@@ -206,12 +199,12 @@ export default function NovaCompraPage() {
               <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 border rounded-lg">
                 <div>
                   <Label>{t("newPurchase.product")}</Label>
-                  <Select value={item.product_sku} onValueChange={(value) => updateItem(index, "product_sku", value)}>
+                  <Select value={item.product_sku} onValueChange={(value: string) => updateItem(index, "product_sku", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder={t("newPurchase.selectProduct")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockProducts.map((product) => (
+                      {products.map((product: any) => (
                         <SelectItem key={product.sku} value={product.sku}>
                           {product.name}
                         </SelectItem>

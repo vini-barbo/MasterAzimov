@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,24 +10,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { recipesApi } from "@/lib/api"
+import { useApi } from "@/hooks/use-api"
+import { recipesApi, productionApi } from "@/lib/api"
+import { api } from "@/lib/api/index"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import type { RecipeIngredient } from "@/lib/types"
 import { useI18n } from "@/lib/i18n"
 
-// Mock products for selection
-const mockProducts = [
-  { sku: "HAM001", name: "Hambúrguer Artesanal", unit: "unidades" },
-  { sku: "PAO002", name: "Pão de Hambúrguer", unit: "pacotes" },
-  { sku: "QUE003", name: "Queijo Cheddar", unit: "kg" },
-  { sku: "CAR004", name: "Carne Bovina 180g", unit: "unidades" },
-  { sku: "ALC005", name: "Alface Americana", unit: "maços" },
-  { sku: "TOM006", name: "Tomate Salada", unit: "kg" },
-]
-
 export default function NovaReceitaPage() {
+  const { data: recipesData, loading: loadingRecipes } = useApi(() => recipesApi.getAll())
+  const { data: productsData, loading: loadingProducts } = useApi(() => api.products.getAll())
+  const products = Array.isArray(productsData) ? productsData : []
   const router = useRouter()
   const { toast } = useToast()
   const { t } = useI18n()
@@ -64,12 +59,12 @@ export default function NovaReceitaPage() {
   const updateIngredient = (index: number, field: string, value: any) => {
     const updatedIngredients = [...ingredients]
     if (field === "product_sku") {
-      const product = mockProducts.find((p) => p.sku === value)
+      const product = products.find((p) => p.sku === value)
       updatedIngredients[index] = {
         ...updatedIngredients[index],
         product_sku: value,
         product_name: product?.name || "",
-        unit: product?.unit || "",
+        unit: "kg",
       }
     } else {
       updatedIngredients[index] = {
@@ -103,7 +98,7 @@ export default function NovaReceitaPage() {
 
     setIsSubmitting(true)
     try {
-      const finalProduct = mockProducts.find((p) => p.sku === finalProductSku)
+      const finalProduct = products.find((p) => p.sku === finalProductSku)
       const recipeIngredients: RecipeIngredient[] = validIngredients.map((ing, index) => ({
         id: (index + 1).toString(),
         ...ing,
@@ -177,7 +172,7 @@ export default function NovaReceitaPage() {
                     <SelectValue placeholder={t("newRecipe.selectFinalProduct")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockProducts.map((product) => (
+                    {products.map((product) => (
                       <SelectItem key={product.sku} value={product.sku}>
                         {product.name}
                       </SelectItem>
@@ -222,13 +217,13 @@ export default function NovaReceitaPage() {
                   <Label>{t("newRecipe.product")}</Label>
                   <Select
                     value={ingredient.product_sku}
-                    onValueChange={(value) => updateIngredient(index, "product_sku", value)}
+                    onValueChange={(value: string) => updateIngredient(index, "product_sku", value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t("newRecipe.selectProduct")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockProducts
+                      {products
                         .filter((p) => p.sku !== finalProductSku)
                         .map((product) => (
                           <SelectItem key={product.sku} value={product.sku}>

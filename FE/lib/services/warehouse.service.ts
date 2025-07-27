@@ -1,38 +1,39 @@
 import { httpClient } from './http-client'
+import { API_ENDPOINTS } from '../config/env'
 import { WarehouseMapper } from '../mappers/warehouse.mapper'
 import { Warehouse, CreateWarehouseDto, UpdateWarehouseDto, WarehouseStockLevel } from '../types/warehouse.types'
 
 export class WarehouseService {
-  private static readonly BASE_PATH = '/warehouses'
+  
 
   static async getAll(): Promise<Warehouse[]> {
-    const response = await httpClient.get<any[]>(this.BASE_PATH)
+    const response = await httpClient.get<any[]>(API_ENDPOINTS.WAREHOUSES.BASE)
     return WarehouseMapper.fromApiResponseArray(response)
   }
 
   static async getById(id: string | number): Promise<Warehouse> {
-    const response = await httpClient.get<any>(`${this.BASE_PATH}/${id}`)
+    const response = await httpClient.get<any>(`${API_ENDPOINTS.WAREHOUSES.BASE}/${id}`)
     return WarehouseMapper.fromApiResponse(response)
   }
 
   static async getStockLevels(id: string | number): Promise<WarehouseStockLevel[]> {
-    const response = await httpClient.get<any[]>(`${this.BASE_PATH}/${id}/stock`)
+    const response = await httpClient.get<any[]>(`${API_ENDPOINTS.WAREHOUSES.BASE}/${id}/stock`)
     return response.map(stock => WarehouseMapper.fromApiStockLevelResponse(stock))
   }
 
   static async create(warehouseData: CreateWarehouseDto): Promise<Warehouse> {
     const payload = WarehouseMapper.toApiRequest(warehouseData)
-    const response = await httpClient.post<any>(this.BASE_PATH, payload)
+    const response = await httpClient.post<any>(API_ENDPOINTS.WAREHOUSES.BASE, payload)
     return WarehouseMapper.fromApiResponse(response)
   }
 
   static async update(id: string | number, warehouseData: UpdateWarehouseDto): Promise<Warehouse> {
     const payload = WarehouseMapper.toApiRequest(warehouseData)
-    const response = await httpClient.patch<any>(`${this.BASE_PATH}/${id}`, payload)
+    const response = await httpClient.patch<any>(`${API_ENDPOINTS.WAREHOUSES.BASE}/${id}`, payload)
     return WarehouseMapper.fromApiResponse(response)
   }
 
   static async delete(id: string | number): Promise<void> {
-    await httpClient.delete(`${this.BASE_PATH}/${id}`)
+    await httpClient.delete(`${API_ENDPOINTS.WAREHOUSES.BASE}/${id}`)
   }
 }

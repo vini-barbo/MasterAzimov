@@ -6,6 +6,9 @@ import { DatabaseModule } from './database/database.module';
 import { RedisModule } from './redis/redis.module';
 import { HealthModule } from './health/health.module';
 
+// Authentication module
+import { AuthModule } from './modules/auth/auth.module';
+
 // New modular structure
 import { ProductsModule } from './modules/products/products.module';
 import { WarehousesModule } from './modules/warehouses/warehouses.module';
@@ -31,6 +34,9 @@ import configs from './config';
     DatabaseModule,
     RedisModule,
     HealthModule,
+
+    // Authentication module
+    AuthModule,
 
     // Business domain modules
     ProductsModule,

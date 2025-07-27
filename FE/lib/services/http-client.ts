@@ -1,4 +1,5 @@
 import { QueryParams, ApiResponse, ErrorResponse } from '../types/common.types'
+import { API_BASE_URL, REQUEST_TIMEOUT, STORAGE_KEYS } from '../config/env'
 
 export interface HttpClientConfig {
   baseURL: string
@@ -123,9 +124,7 @@ export class HttpError extends Error {
 }
 
 // Create singleton instance
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-
 export const httpClient = new HttpClient({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: REQUEST_TIMEOUT,
 })

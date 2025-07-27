@@ -2,7 +2,9 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "../hooks/use-toast"
+import { httpClient } from "./services/http-client"
+import { API_ENDPOINTS, STORAGE_KEYS } from "./config/env"
 
 export interface User {
   id: string
@@ -11,6 +13,17 @@ export interface User {
   roles: string[]
   is_active: boolean
   created_at: string
+}
+
+export interface LoginResponse {
+  user: User
+  access_token: string
+  refresh_token: string
+}
+
+export interface RefreshResponse {
+  access_token: string
+  refresh_token: string
 }
 
 export interface AuthContextType {
@@ -29,87 +42,44 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Mock API functions seguindo o guia
+// Real API functions connecting to backend
 const authApi = {
-  login: async (email: string, password: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Simular erro de credenciais inválidas ocasionalmente
-    if (Math.random() < 0.1) {
-      throw new Error("Email ou senha incorretos")
-    }
-
-    const isAdmin = email.includes("admin")
-    const mockUser: User = {
-      id: "1",
+  login: async (email: string, password: string): Promise<LoginResponse> => {
+    const response = await httpClient.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
       email,
-      full_name: isAdmin ? "Administrador Sistema" : "Usuário Comum",
-      roles: isAdmin ? ["admin", "user"] : ["user"],
-      is_active: true,
-      created_at: new Date().toISOString(),
-    }
-
-    return {
-      user: mockUser,
-      access_token: "mock-jwt-token-" + Date.now(),
-      refresh_token: "mock-refresh-token-" + Date.now(),
-    }
+      password,
+    })
+    return response
   },
 
-  register: async (full_name: string, email: string, password: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Simular erro de email já existente
-    if (email === "admin@sistema.com") {
-      throw new Error("Este email já está em uso")
-    }
-
-    const mockUser: User = {
-      id: Date.now().toString(),
-      email,
+  register: async (full_name: string, email: string, password: string): Promise<{ user: User }> => {
+    const response = await httpClient.post<{ user: User }>(API_ENDPOINTS.AUTH.REGISTER, {
       full_name,
-      roles: ["user"],
-      is_active: true,
-      created_at: new Date().toISOString(),
-    }
-
-    return { user: mockUser }
+      email,
+      password,
+    })
+    return response
   },
 
-  refreshToken: async (refresh_token: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    // Simular falha ocasional do refresh
-    if (Math.random() < 0.05) {
-      throw new Error("Refresh token inválido")
-    }
-
-    return {
-      access_token: "new-mock-jwt-token-" + Date.now(),
-      refresh_token: "new-mock-refresh-token-" + Date.now(),
-    }
+  refreshToken: async (refresh_token: string): Promise<RefreshResponse> => {
+    const response = await httpClient.post<RefreshResponse>(API_ENDPOINTS.AUTH.REFRESH, {
+      refresh_token,
+    })
+    return response
   },
 
-  logout: async () => {
-    await new Promise((resolve) => setTimeout(resolve, 300))
-    // Invalidar token no servidor
+  logout: async (): Promise<void> => {
+    await httpClient.post(API_ENDPOINTS.AUTH.LOGOUT)
   },
 
-  getProfile: async (userId: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    return {
-      id: userId,
-      email: "user@example.com",
-      full_name: "Usuário Exemplo",
-      roles: ["user"],
-      is_active: true,
-      created_at: new Date().toISOString(),
-    }
+  getProfile: async (): Promise<User> => {
+    const response = await httpClient.get<User>(API_ENDPOINTS.AUTH.PROFILE)
+    return response
   },
 
-  updateProfile: async (userId: string, data: Partial<User>) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    return { ...data, id: userId }
+  updateProfile: async (data: Partial<User>): Promise<User> => {
+    const response = await httpClient.put<User>(API_ENDPOINTS.AUTH.PROFILE, data)
+    return response
   },
 }
 
@@ -122,26 +92,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Interceptor para requisições HTTP
   const setupInterceptor = () => {
-    // Em uma implementação real, configuraria interceptors do Axios aqui
-    // para adicionar token automaticamente e tratar 401s
+    // Token já está configurado no httpClient através do setAuthToken
+    // Aqui podemos adicionar logic adicional se necessário, como auto-refresh
   }
 
   useEffect(() => {
     // Verificar token armazenado na inicialização
-    const storedToken = localStorage.getItem("access_token")
-    const storedUser = localStorage.getItem("user")
+    const storedToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
+    const storedUser = localStorage.getItem(STORAGE_KEYS.USER)
 
     if (storedToken && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser)
         setToken(storedToken)
         setUser(parsedUser)
+        httpClient.setAuthToken(storedToken)
         setupInterceptor()
       } catch (error) {
         // Token ou user corrompido, limpar
-        localStorage.removeItem("access_token")
-        localStorage.removeItem("refresh_token")
-        localStorage.removeItem("user")
+        localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN)
+        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+        localStorage.removeItem(STORAGE_KEYS.USER)
       }
     }
 
@@ -157,10 +128,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(response.access_token)
 
       // Armazenar tokens de forma segura
-      localStorage.setItem("access_token", response.access_token)
-      localStorage.setItem("refresh_token", response.refresh_token)
-      localStorage.setItem("user", JSON.stringify(response.user))
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token)
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token)
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user))
 
+      httpClient.setAuthToken(response.access_token)
       setupInterceptor()
 
       toast({
@@ -217,9 +189,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setUser(null)
       setToken(null)
-      localStorage.removeItem("access_token")
-      localStorage.removeItem("refresh_token")
-      localStorage.removeItem("user")
+      httpClient.removeAuthToken()
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN)
+      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+      localStorage.removeItem(STORAGE_KEYS.USER)
 
       toast({
         title: "Logout realizado",
@@ -232,14 +205,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshToken = async (): Promise<boolean> => {
     try {
-      const refresh_token = localStorage.getItem("refresh_token")
+      const refresh_token = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
       if (!refresh_token) return false
 
       const response = await authApi.refreshToken(refresh_token)
 
       setToken(response.access_token)
-      localStorage.setItem("access_token", response.access_token)
-      localStorage.setItem("refresh_token", response.refresh_token)
+      httpClient.setAuthToken(response.access_token)
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token)
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token)
 
       return true
     } catch (error) {
@@ -253,11 +227,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       setIsLoading(true)
-      const updatedData = await authApi.updateProfile(user.id, data)
-      const updatedUser = { ...user, ...updatedData }
+      const updatedUser = await authApi.updateProfile(data)
 
       setUser(updatedUser)
-      localStorage.setItem("user", JSON.stringify(updatedUser))
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser))
 
       toast({
         title: "Perfil atualizado",

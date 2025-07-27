@@ -1,4 +1,5 @@
 import { httpClient } from './http-client'
+import { API_ENDPOINTS } from '../config/env'
 import { NotificationMapper } from '../mappers/notification.mapper'
 import { NotificationRule, CreateNotificationRuleDto, UpdateNotificationRuleDto, NotificationLog, NotificationRuleQueryParams, NotificationLogQueryParams } from '../types/notification.types'
 

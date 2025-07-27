@@ -1,242 +1,158 @@
-import type { Supplier, PurchaseOrder, Recipe, Production } from "./types"
+import type { Supplier, PurchaseOrder, PurchaseOrderItem, Recipe, Production } from "./types"
+import { httpClient } from "./services/http-client"
+import { API_ENDPOINTS } from "./config/env"
 
-// Mock data
-const mockSuppliers: Supplier[] = [
-  {
-    id: "1",
-    name: "Fornecedor de Carnes Premium",
-    email: "contato@carnespremium.com",
-    phone: "(11) 99999-1111",
-    address: "Rua das Carnes, 123 - São Paulo, SP",
-    created_at: "2024-01-10T10:00:00Z",
-  },
-  {
-    id: "2",
-    name: "Distribuidora de Vegetais Frescos",
-    email: "vendas@vegetaisfrescos.com",
-    phone: "(11) 88888-2222",
-    address: "Av. dos Vegetais, 456 - São Paulo, SP",
-    created_at: "2024-01-12T14:30:00Z",
-  },
-]
-
-const mockPurchaseOrders: PurchaseOrder[] = [
-  {
-    id: "1",
-    supplier_id: "1",
-    supplier_name: "Fornecedor de Carnes Premium",
-    status: "pending",
-    total_amount: 1500.0,
-    created_at: "2024-01-15T09:00:00Z",
-    items: [
-      {
-        id: "1",
-        product_sku: "CAR004",
-        product_name: "Carne Bovina 180g",
-        quantity: 50,
-        unit_price: 20.0,
-        total_price: 1000.0,
-      },
-      {
-        id: "2",
-        product_sku: "QUE003",
-        product_name: "Queijo Cheddar",
-        quantity: 10,
-        unit_price: 50.0,
-        total_price: 500.0,
-      },
-    ],
-  },
-  {
-    id: "2",
-    supplier_id: "2",
-    supplier_name: "Distribuidora de Vegetais Frescos",
-    status: "received",
-    total_amount: 300.0,
-    created_at: "2024-01-14T11:00:00Z",
-    received_at: "2024-01-15T16:00:00Z",
-    items: [
-      {
-        id: "3",
-        product_sku: "ALC005",
-        product_name: "Alface Americana",
-        quantity: 50,
-        unit_price: 3.0,
-        total_price: 150.0,
-      },
-      {
-        id: "4",
-        product_sku: "TOM006",
-        product_name: "Tomate Salada",
-        quantity: 20,
-        unit_price: 7.5,
-        total_price: 150.0,
-      },
-    ],
-  },
-]
-
-const mockRecipes: Recipe[] = [
-  {
-    id: "1",
-    name: "Hambúrguer Completo",
-    final_product_sku: "HAM001",
-    final_product_name: "Hambúrguer Artesanal",
-    yield_quantity: 1,
-    created_at: "2024-01-10T10:00:00Z",
-    ingredients: [
-      {
-        id: "1",
-        product_sku: "CAR004",
-        product_name: "Carne Bovina 180g",
-        quantity_needed: 1,
-        unit: "unidades",
-      },
-      {
-        id: "2",
-        product_sku: "PAO002",
-        product_name: "Pão de Hambúrguer",
-        quantity_needed: 1,
-        unit: "unidades",
-      },
-      {
-        id: "3",
-        product_sku: "QUE003",
-        product_name: "Queijo Cheddar",
-        quantity_needed: 0.05,
-        unit: "kg",
-      },
-      {
-        id: "4",
-        product_sku: "ALC005",
-        product_name: "Alface Americana",
-        quantity_needed: 0.1,
-        unit: "maços",
-      },
-      {
-        id: "5",
-        product_sku: "TOM006",
-        product_name: "Tomate Salada",
-        quantity_needed: 0.05,
-        unit: "kg",
-      },
-    ],
-  },
-]
-
-// API functions
+// Real API functions using backend endpoints
 export const suppliersApi = {
   getAll: async (): Promise<Supplier[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    return mockSuppliers
+    const response = await httpClient.get<Supplier[]>(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers`)
+    return response
   },
 
   create: async (supplier: Omit<Supplier, "id" | "created_at">): Promise<Supplier> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const newSupplier: Supplier = {
-      ...supplier,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString(),
-    }
-    mockSuppliers.push(newSupplier)
-    return newSupplier
+    const response = await httpClient.post<Supplier>(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers`, supplier)
+    return response
   },
 
   update: async (id: string, supplier: Partial<Supplier>): Promise<Supplier> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const index = mockSuppliers.findIndex((s) => s.id === id)
-    if (index === -1) throw new Error("Fornecedor não encontrado")
-    mockSuppliers[index] = { ...mockSuppliers[index], ...supplier }
-    return mockSuppliers[index]
+    const response = await httpClient.put<Supplier>(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers/${id}`, supplier)
+    return response
   },
+
+  delete: async (id: string): Promise<void> => {
+    await httpClient.delete(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers/${id}`)
+  },
+}
+
+// Mapping function to adapt backend data to frontend types
+const mapPurchaseOrderFromBackend = (backendOrder: any): PurchaseOrder => {
+  return {
+    id: backendOrder.id.toString(),
+    supplier_id: backendOrder.supplierId.toString(),
+    supplier_name: backendOrder.supplier?.name || 'Fornecedor desconhecido',
+    status: backendOrder.status as "PENDING" | "RECEIVED" | "CANCELLED",
+    total_amount: parseFloat(backendOrder.totalAmount || 0),
+    notes: backendOrder.notes || '',
+    expected_delivery_date: backendOrder.orderDate,
+    received_date: backendOrder.receivedAt,
+    created_at: backendOrder.createdAt,
+    updated_at: backendOrder.updatedAt,
+    items: (backendOrder.purchaseOrderItems || []).map((item: any): PurchaseOrderItem => ({
+      id: item.id.toString(),
+      product_id: item.productId.toString(),
+      product_name: item.product?.name || 'Produto desconhecido',
+      product_sku: item.product?.sku || '',
+      quantity: item.quantity,
+      unit_price: parseFloat(item.unitPrice || 0),
+      total_price: item.quantity * parseFloat(item.unitPrice || 0),
+    })),
+  }
 }
 
 export const purchaseOrdersApi = {
   getAll: async (): Promise<PurchaseOrder[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    return mockPurchaseOrders
+    const response = await httpClient.get<{data: any[], pagination: any}>(API_ENDPOINTS.PURCHASES.BASE)
+    return response.data.map(mapPurchaseOrderFromBackend)
   },
 
   getById: async (id: string): Promise<PurchaseOrder> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const order = mockPurchaseOrders.find((o) => o.id === id)
-    if (!order) throw new Error("Pedido não encontrado")
-    return order
+    const response = await httpClient.get<any>(API_ENDPOINTS.PURCHASES.BY_ID(id))
+    return mapPurchaseOrderFromBackend(response)
   },
 
   create: async (order: Omit<PurchaseOrder, "id" | "created_at">): Promise<PurchaseOrder> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const newOrder: PurchaseOrder = {
-      ...order,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString(),
-    }
-    mockPurchaseOrders.push(newOrder)
-    return newOrder
+    const response = await httpClient.post<any>(API_ENDPOINTS.PURCHASES.BASE, order)
+    return mapPurchaseOrderFromBackend(response)
+  },
+
+  update: async (id: string, order: Partial<PurchaseOrder>): Promise<PurchaseOrder> => {
+    const response = await httpClient.put<any>(API_ENDPOINTS.PURCHASES.BY_ID(id), order)
+    return mapPurchaseOrderFromBackend(response)
   },
 
   markAsReceived: async (id: string): Promise<PurchaseOrder> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const index = mockPurchaseOrders.findIndex((o) => o.id === id)
-    if (index === -1) throw new Error("Pedido não encontrado")
-    mockPurchaseOrders[index] = {
-      ...mockPurchaseOrders[index],
-      status: "received",
-      received_at: new Date().toISOString(),
-    }
-    return mockPurchaseOrders[index]
+    const response = await httpClient.post<any>(`${API_ENDPOINTS.PURCHASES.BY_ID(id)}/receive`)
+    return mapPurchaseOrderFromBackend(response)
+  },
+
+  markAsApproved: async (id: string): Promise<PurchaseOrder> => {
+    const response = await httpClient.post<any>(`${API_ENDPOINTS.PURCHASES.BY_ID(id)}/approve`)
+    return mapPurchaseOrderFromBackend(response)
+  },
+
+  getPending: async (): Promise<PurchaseOrder[]> => {
+    const response = await httpClient.get<{data: any[], pagination: any}>(API_ENDPOINTS.PURCHASES.PENDING)
+    return response.data.map(mapPurchaseOrderFromBackend)
+  },
+
+  getApproved: async (): Promise<PurchaseOrder[]> => {
+    const response = await httpClient.get<{data: any[], pagination: any}>(API_ENDPOINTS.PURCHASES.APPROVED)
+    return response.data.map(mapPurchaseOrderFromBackend)
   },
 }
 
 export const recipesApi = {
   getAll: async (): Promise<Recipe[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    return mockRecipes
+    const response = await httpClient.get<Recipe[]>(`${API_ENDPOINTS.PRODUCTION.BASE}/recipes`)
+    return response
   },
 
   getById: async (id: string): Promise<Recipe> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const recipe = mockRecipes.find((r) => r.id === id)
-    if (!recipe) throw new Error("Receita não encontrada")
-    return recipe
+    const response = await httpClient.get<Recipe>(`${API_ENDPOINTS.PRODUCTION.BASE}/recipes/${id}`)
+    return response
   },
 
   create: async (recipe: Omit<Recipe, "id" | "created_at">): Promise<Recipe> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const newRecipe: Recipe = {
-      ...recipe,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString(),
-    }
-    mockRecipes.push(newRecipe)
-    return newRecipe
+    const response = await httpClient.post<Recipe>(`${API_ENDPOINTS.PRODUCTION.BASE}/recipes`, recipe)
+    return response
+  },
+
+  update: async (id: string, recipe: Partial<Recipe>): Promise<Recipe> => {
+    const response = await httpClient.put<Recipe>(`${API_ENDPOINTS.PRODUCTION.BASE}/recipes/${id}`, recipe)
+    return response
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await httpClient.delete(`${API_ENDPOINTS.PRODUCTION.BASE}/recipes/${id}`)
   },
 }
 
 export const productionApi = {
   execute: async (recipeId: string, quantity: number): Promise<Production> => {
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    const recipe = mockRecipes.find((r) => r.id === recipeId)
-    if (!recipe) throw new Error("Receita não encontrada")
-
-    // Simular verificação de estoque
-    if (Math.random() < 0.1) {
-      throw new Error("Estoque insuficiente para alguns ingredientes")
-    }
-
-    const production: Production = {
-      id: Date.now().toString(),
+    const response = await httpClient.post<Production>(`${API_ENDPOINTS.PRODUCTION.BASE}/execute`, {
       recipe_id: recipeId,
-      recipe_name: recipe.name,
-      quantity_produced: quantity,
-      status: "completed",
-      created_at: new Date().toISOString(),
-      ingredients_consumed: recipe.ingredients.map((ing) => ({
-        ...ing,
-        quantity_needed: ing.quantity_needed * quantity,
-      })),
-    }
+      quantity
+    })
+    return response
+  },
 
-    return production
+  getAll: async (): Promise<Production[]> => {
+    const response = await httpClient.get<Production[]>(API_ENDPOINTS.PRODUCTION.BASE)
+    return response
+  },
+
+  getById: async (id: string): Promise<Production> => {
+    const response = await httpClient.get<Production>(API_ENDPOINTS.PRODUCTION.BY_ID(id))
+    return response
+  },
+
+  getActive: async (): Promise<Production[]> => {
+    const response = await httpClient.get<Production[]>(API_ENDPOINTS.PRODUCTION.ACTIVE)
+    return response
+  },
+
+  getCompleted: async (): Promise<Production[]> => {
+    const response = await httpClient.get<Production[]>(API_ENDPOINTS.PRODUCTION.COMPLETED)
+    return response
+  },
+
+  cancel: async (id: string): Promise<Production> => {
+    const response = await httpClient.post<Production>(`${API_ENDPOINTS.PRODUCTION.BY_ID(id)}/cancel`)
+    return response
+  },
+
+  complete: async (id: string): Promise<Production> => {
+    const response = await httpClient.post<Production>(`${API_ENDPOINTS.PRODUCTION.BY_ID(id)}/complete`)
+    return response
   },
 }

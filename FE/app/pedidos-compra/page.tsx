@@ -22,11 +22,11 @@ function formatCurrency(value: number) {
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "pending":
+    case "PENDING":
       return "secondary"
-    case "received":
+    case "RECEIVED":
       return "default"
-    case "cancelled":
+    case "CANCELLED":
       return "destructive"
     default:
       return "outline"
@@ -35,11 +35,11 @@ function getStatusColor(status: string) {
 
 function getStatusIcon(status: string) {
   switch (status) {
-    case "pending":
+    case "PENDING":
       return Clock
-    case "received":
+    case "RECEIVED":
       return CheckCircle
-    case "cancelled":
+    case "CANCELLED":
       return X
     default:
       return Package
@@ -48,11 +48,11 @@ function getStatusIcon(status: string) {
 
 function getStatusText(status: string, t: any) {
   switch (status) {
-    case "pending":
+    case "PENDING":
       return t("status.pending")
-    case "received":
+    case "RECEIVED":
       return t("status.received")
-    case "cancelled":
+    case "CANCELLED":
       return t("status.cancelled")
     default:
       return status
@@ -60,7 +60,7 @@ function getStatusText(status: string, t: any) {
 }
 
 export default function PedidosCompraPage() {
-  const { data: orders, loading, refetch } = useApi(() => purchaseOrdersApi.getAll())
+  const { data: orders, loading, error, refetch } = useApi(() => purchaseOrdersApi.getAll())
   const { toast } = useToast()
   const { t, language } = useI18n()
   const [processingOrder, setProcessingOrder] = useState<string | null>(null)
@@ -107,9 +107,34 @@ export default function PedidosCompraPage() {
     )
   }
 
-  const pendingOrders = orders?.filter((order) => order.status === "pending").length || 0
-  const receivedOrders = orders?.filter((order) => order.status === "received").length || 0
-  const totalValue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
+  if (error) {
+    return (
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <SidebarTrigger />
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight">{t("purchaseOrders.title")}</h2>
+              <p className="text-muted-foreground">{t("purchaseOrders.subtitle")}</p>
+            </div>
+          </div>
+        </div>
+        <div className="text-center py-12">
+          <X className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">Erro ao carregar pedidos</h3>
+          <p className="text-muted-foreground mb-4">Não foi possível carregar os pedidos de compra</p>
+          <Button onClick={refetch}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const pendingOrders = Array.isArray(orders) ? orders.filter((order) => order.status === "PENDING").length : 0
+  const receivedOrders = Array.isArray(orders) ? orders.filter((order) => order.status === "RECEIVED").length : 0
+  const totalValue = Array.isArray(orders) ? orders.reduce((sum, order) => sum + order.total_amount, 0) : 0
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -226,10 +251,10 @@ export default function PedidosCompraPage() {
                         {order.items.length} {t("purchaseOrders.items")} •{" "}
                         {order.items.reduce((sum, item) => sum + item.quantity, 0)} {t("purchaseOrders.units")}
                       </div>
-                      {order.received_at && (
+                      {order.received_date && (
                         <div className="text-sm text-green-600">
                           {t("purchaseOrders.receivedOn")}{" "}
-                          {new Date(order.received_at).toLocaleDateString(language === "pt" ? "pt-BR" : "en-US")}
+                          {new Date(order.received_date).toLocaleDateString(language === "pt" ? "pt-BR" : "en-US")}
                         </div>
                       )}
                     </div>
@@ -240,7 +265,7 @@ export default function PedidosCompraPage() {
                           {t("purchaseOrders.details")}
                         </Link>
                       </Button>
-                      {order.status === "pending" && (
+                      {order.status === "PENDING" && (
                         <Button
                           size="sm"
                           onClick={() => handleMarkAsReceived(order.id)}
@@ -310,10 +335,10 @@ export default function PedidosCompraPage() {
                       <TableCell>
                         <div className="text-sm">
                           {new Date(order.created_at).toLocaleDateString("pt-BR")}
-                          {order.received_at && (
+                          {order.received_date && (
                             <div className="text-green-600">
                               {t("purchaseOrders.receivedOn")}{" "}
-                              {new Date(order.received_at).toLocaleDateString(language === "pt" ? "pt-BR" : "en-US")}
+                              {new Date(order.received_date).toLocaleDateString(language === "pt" ? "pt-BR" : "en-US")}
                             </div>
                           )}
                         </div>
@@ -326,7 +351,7 @@ export default function PedidosCompraPage() {
                               {t("purchaseOrders.details")}
                             </Link>
                           </Button>
-                          {order.status === "pending" && (
+                          {order.status === "PENDING" && (
                             <Button
                               size="sm"
                               onClick={() => handleMarkAsReceived(order.id)}
