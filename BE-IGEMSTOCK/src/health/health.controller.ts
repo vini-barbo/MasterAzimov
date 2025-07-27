@@ -7,31 +7,50 @@ export class HealthController {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly redisService: RedisService,
-  ) {}
+  ) { }
 
   @Get()
   async check() {
     try {
-      // Test database connection with a simple query
-      await this.prismaService.user.findMany({ take: 1 });
+      // Test database connection with a simple query that should always work
+      await this.prismaService.$queryRaw`SELECT 1`;
 
       // Test Redis connection
-      await this.redisService.set('health-check', 'ok', 'EX', 10);
-      const redisResult = await this.redisService.get('health-check');
+      const isRedisConnected = await this.redisService.isConnected();
 
-      return {
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        services: {
-          database: 'connected',
-          redis: redisResult === 'ok' ? 'connected' : 'error',
-        },
-      };
+      if (isRedisConnected) {
+        // Test basic Redis operations
+        await this.redisService.set('health-check', 'ok', 'EX', 10);
+        const redisResult = await this.redisService.get('health-check');
+
+        return {
+          status: 'ok',
+          timestamp: new Date().toISOString(),
+          services: {
+            database: 'connected',
+            redis: redisResult === 'ok' ? 'connected' : 'error',
+          },
+        };
+      } else {
+        return {
+          status: 'degraded',
+          timestamp: new Date().toISOString(),
+          services: {
+            database: 'connected',
+            redis: 'disconnected',
+          },
+        };
+      }
     } catch (error) {
+      console.error('Health check error:', error);
       return {
         status: 'error',
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : 'Unknown error',
+        services: {
+          database: 'unknown',
+          redis: 'unknown',
+        },
       };
     }
   }

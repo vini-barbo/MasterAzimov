@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useApi } from "@/hooks/use-api"
 import { suppliersApi } from "@/lib/api"
-import type { Supplier } from "@/lib/types"
+import type { Supplier, CreateSupplierDto } from "@/lib/types/supplier.types"
 import { useToast } from "@/hooks/use-toast"
 import { useI18n } from "@/lib/i18n"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -41,7 +41,7 @@ export default function FornecedoresPage() {
 
     try {
       if (editingSupplier) {
-        await suppliersApi.update(editingSupplier.id, formData)
+        await suppliersApi.update(editingSupplier.id.toString(), formData)
         toast({
           title: t("suppliers.updated"),
           description: t("suppliers.updateSuccess"),
@@ -73,9 +73,9 @@ export default function FornecedoresPage() {
     setEditingSupplier(supplier)
     setFormData({
       name: supplier.name,
-      email: supplier.email,
-      phone: supplier.phone,
-      address: supplier.address,
+      email: supplier.email || "",
+      phone: supplier.phone || "",
+      address: supplier.address || "",
     })
     setIsDialogOpen(true)
   }

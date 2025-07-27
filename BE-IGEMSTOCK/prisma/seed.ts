@@ -1,26 +1,87 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@igemstock.com' },
-    update: {},
-    create: {
+  // Create users with different roles and passwords
+  const users = [
+    {
       email: 'admin@igemstock.com',
       username: 'admin',
-      password: hashedPassword,
+      password: 'admin123',
       firstName: 'Admin',
       lastName: 'User',
       role: 'ADMIN',
-      isActive: true,
     },
-  });
+    {
+      email: 'moderator@igemstock.com',
+      username: 'moderator',
+      password: 'mod123',
+      firstName: 'João',
+      lastName: 'Moderador',
+      role: 'MODERATOR',
+    },
+    {
+      email: 'user@igemstock.com',
+      username: 'user',
+      password: 'user123',
+      firstName: 'Maria',
+      lastName: 'Silva',
+      role: 'USER',
+    },
+    {
+      email: 'operador@igemstock.com',
+      username: 'operador',
+      password: 'op123',
+      firstName: 'Carlos',
+      lastName: 'Operador',
+      role: 'USER',
+    },
+    {
+      email: 'supervisor@igemstock.com',
+      username: 'supervisor',
+      password: 'super123',
+      firstName: 'Ana',
+      lastName: 'Supervisora',
+      role: 'MODERATOR',
+    },
+    {
+      email: 'gerente@igemstock.com',
+      username: 'gerente',
+      password: 'ger123',
+      firstName: 'Roberto',
+      lastName: 'Gerente',
+      role: 'ADMIN',
+    },
+  ];
 
+  const createdUsers = [];
+  for (const userData of users) {
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+    const user = await prisma.user.upsert({
+      where: { email: userData.email },
+      update: {},
+      create: {
+        email: userData.email,
+        username: userData.username,
+        password: hashedPassword,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        role: userData.role as 'ADMIN' | 'USER' | 'MODERATOR',
+        isActive: true,
+      },
+    });
+
+    createdUsers.push(user);
+    console.log(
+      `Created user: ${user.username} (${user.role}) - Password: ${userData.password}`,
+    );
+  }
+
+  // For backward compatibility, keep adminUser reference to first admin
+  const adminUser = createdUsers.find((user) => user.role === 'ADMIN');
   console.log({ adminUser });
 
   // Create warehouses
@@ -50,7 +111,7 @@ async function main() {
       sku: 'ACET-500',
       name: 'Acetaminophen 500mg',
       description: 'Pain reliever and fever reducer',
-      unitCost: 10.50,
+      unitCost: 10.5,
     },
     {
       sku: 'IBU-200',
@@ -178,7 +239,7 @@ async function main() {
       saleId: sale.id,
       productId: createdProducts[0].id,
       quantity: 2,
-      unitPrice: 12.50,
+      unitPrice: 12.5,
     },
     {
       saleId: sale.id,
@@ -539,7 +600,7 @@ async function main() {
       update: {},
       create: {
         ...item,
-        createdBy: adminUser.id,
+        createdBy: adminUser?.id || createdUsers[0]?.id,
       },
     });
     console.log({ stockItem });

@@ -31,6 +31,13 @@ export const API_ENDPOINTS = {
     SUPPLIERS: '/products/suppliers',
   },
 
+  // Suppliers
+  SUPPLIERS: {
+    BASE: '/suppliers',
+    BY_ID: (id: string) => `/suppliers/${id}`,
+    SEARCH: (name: string) => `/suppliers/search/${name}`,
+  },
+
   // Warehouses
   WAREHOUSES: {
     BASE: '/warehouses',

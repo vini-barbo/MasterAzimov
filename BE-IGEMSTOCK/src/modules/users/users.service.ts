@@ -70,6 +70,19 @@ export class UsersService {
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
+      // Include password for authentication purposes
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        password: true, // Include password for login validation
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 

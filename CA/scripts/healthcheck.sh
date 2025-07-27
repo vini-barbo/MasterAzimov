@@ -4,14 +4,20 @@ set -e
 # Redis Health Check Script
 echo "Performing Redis health check..."
 
+# Set up authentication if password is configured
+REDIS_CLI_CMD="redis-cli"
+if [ -n "$REDIS_PASSWORD" ]; then
+    export REDISCLI_AUTH="$REDIS_PASSWORD"
+fi
+
 # Check if Redis is responding to ping
-if ! redis-cli ping >/dev/null 2>&1; then
+if ! $REDIS_CLI_CMD ping >/dev/null 2>&1; then
     echo "FAIL: Redis is not responding to ping"
     exit 1
 fi
 
 # Check Redis info
-info_output=$(redis-cli info server 2>/dev/null)
+info_output=$($REDIS_CLI_CMD info server 2>/dev/null)
 if [ $? -ne 0 ]; then
     echo "FAIL: Cannot get Redis server info"
     exit 1
@@ -25,7 +31,7 @@ if [ -z "$redis_version" ]; then
 fi
 
 # Check memory usage
-memory_info=$(redis-cli info memory 2>/dev/null)
+memory_info=$($REDIS_CLI_CMD info memory 2>/dev/null)
 if [ $? -ne 0 ]; then
     echo "FAIL: Cannot get Redis memory info"
     exit 1
@@ -46,22 +52,22 @@ fi
 redis_mode=$(echo "$info_output" | grep "redis_mode:" | cut -d: -f2 | tr -d '\r')
 
 # Check connected clients
-clients_info=$(redis-cli info clients 2>/dev/null)
+clients_info=$($REDIS_CLI_CMD info clients 2>/dev/null)
 connected_clients=$(echo "$clients_info" | grep "connected_clients:" | cut -d: -f2 | tr -d '\r')
 
 # Test basic operations
 test_key="health_check_$(date +%s)"
-if ! redis-cli set "$test_key" "test_value" ex 10 >/dev/null 2>&1; then
+if ! $REDIS_CLI_CMD set "$test_key" "test_value" ex 10 >/dev/null 2>&1; then
     echo "FAIL: Cannot write to Redis"
     exit 1
 fi
 
-if ! redis-cli get "$test_key" >/dev/null 2>&1; then
+if ! $REDIS_CLI_CMD get "$test_key" >/dev/null 2>&1; then
     echo "FAIL: Cannot read from Redis"
     exit 1
 fi
 
-if ! redis-cli del "$test_key" >/dev/null 2>&1; then
+if ! $REDIS_CLI_CMD del "$test_key" >/dev/null 2>&1; then
     echo "FAIL: Cannot delete from Redis"
     exit 1
 fi

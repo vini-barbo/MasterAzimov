@@ -1,26 +1,77 @@
-import type { Supplier, PurchaseOrder, PurchaseOrderItem, Recipe, Production } from "./types"
+import type { Supplier, CreateSupplierDto, UpdateSupplierDto } from "./types/supplier.types"
+import type { PurchaseOrder, PurchaseOrderItem } from "./types/purchase.types"
+import type { Recipe } from "./types/production.types"
 import { httpClient } from "./services/http-client"
 import { API_ENDPOINTS } from "./config/env"
+
+// Legacy types for backward compatibility
+interface Production {
+  id: string
+  recipe_id: string
+  recipe_name: string
+  quantity_produced: number
+  status: "completed" | "failed"
+  created_at: string
+  ingredients_consumed: any[]
+}
+
+// Mapping function to adapt backend data to frontend types
+const mapSupplierFromBackend = (backendSupplier: any): Supplier => {
+  return {
+    id: backendSupplier.id.toString(),
+    name: backendSupplier.name,
+    email: backendSupplier.contactEmail, // Map contactEmail to email for frontend
+    phone: backendSupplier.phone,
+    address: backendSupplier.address,
+    created_at: backendSupplier.createdAt,
+    updated_at: backendSupplier.updatedAt,
+    _count: backendSupplier._count,
+  }
+}
 
 // Real API functions using backend endpoints
 export const suppliersApi = {
   getAll: async (): Promise<Supplier[]> => {
-    const response = await httpClient.get<Supplier[]>(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers`)
-    return response
+    const response = await httpClient.get<any[]>(API_ENDPOINTS.SUPPLIERS.BASE)
+    return response.map(mapSupplierFromBackend)
   },
 
-  create: async (supplier: Omit<Supplier, "id" | "created_at">): Promise<Supplier> => {
-    const response = await httpClient.post<Supplier>(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers`, supplier)
-    return response
+  getById: async (id: string): Promise<Supplier> => {
+    const response = await httpClient.get<any>(API_ENDPOINTS.SUPPLIERS.BY_ID(id))
+    return mapSupplierFromBackend(response)
   },
 
-  update: async (id: string, supplier: Partial<Supplier>): Promise<Supplier> => {
-    const response = await httpClient.put<Supplier>(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers/${id}`, supplier)
-    return response
+  create: async (supplier: CreateSupplierDto): Promise<Supplier> => {
+    // Map frontend field names to backend field names
+    const backendData = {
+      name: supplier.name,
+      contactEmail: supplier.email, // Map email to contactEmail
+      phone: supplier.phone,
+      address: supplier.address,
+    }
+    const response = await httpClient.post<any>(API_ENDPOINTS.SUPPLIERS.BASE, backendData)
+    return mapSupplierFromBackend(response)
+  },
+
+  update: async (id: string, supplier: Partial<UpdateSupplierDto>): Promise<Supplier> => {
+    // Map frontend field names to backend field names
+    const backendData: any = {}
+    if (supplier.name) backendData.name = supplier.name
+    if (supplier.email) backendData.contactEmail = supplier.email // Map email to contactEmail
+    if (supplier.phone) backendData.phone = supplier.phone
+    if (supplier.address) backendData.address = supplier.address
+
+    const response = await httpClient.patch<any>(API_ENDPOINTS.SUPPLIERS.BY_ID(id), backendData)
+    return mapSupplierFromBackend(response)
   },
 
   delete: async (id: string): Promise<void> => {
-    await httpClient.delete(`${API_ENDPOINTS.PRODUCTS.BASE}/suppliers/${id}`)
+    await httpClient.delete(API_ENDPOINTS.SUPPLIERS.BY_ID(id))
+  },
+
+  searchByName: async (name: string): Promise<Supplier[]> => {
+    const response = await httpClient.get<any[]>(API_ENDPOINTS.SUPPLIERS.SEARCH(name))
+    return response.map(mapSupplierFromBackend)
   },
 }
 
@@ -30,7 +81,7 @@ const mapPurchaseOrderFromBackend = (backendOrder: any): PurchaseOrder => {
     id: backendOrder.id.toString(),
     supplier_id: backendOrder.supplierId.toString(),
     supplier_name: backendOrder.supplier?.name || 'Fornecedor desconhecido',
-    status: backendOrder.status as "PENDING" | "RECEIVED" | "CANCELLED",
+    status: backendOrder.status.toLowerCase() as "pending" | "received" | "cancelled",
     total_amount: parseFloat(backendOrder.totalAmount || 0),
     notes: backendOrder.notes || '',
     expected_delivery_date: backendOrder.orderDate,
@@ -51,7 +102,7 @@ const mapPurchaseOrderFromBackend = (backendOrder: any): PurchaseOrder => {
 
 export const purchaseOrdersApi = {
   getAll: async (): Promise<PurchaseOrder[]> => {
-    const response = await httpClient.get<{data: any[], pagination: any}>(API_ENDPOINTS.PURCHASES.BASE)
+    const response = await httpClient.get<{ data: any[], pagination: any }>(API_ENDPOINTS.PURCHASES.BASE)
     return response.data.map(mapPurchaseOrderFromBackend)
   },
 
@@ -81,12 +132,12 @@ export const purchaseOrdersApi = {
   },
 
   getPending: async (): Promise<PurchaseOrder[]> => {
-    const response = await httpClient.get<{data: any[], pagination: any}>(API_ENDPOINTS.PURCHASES.PENDING)
+    const response = await httpClient.get<{ data: any[], pagination: any }>(API_ENDPOINTS.PURCHASES.PENDING)
     return response.data.map(mapPurchaseOrderFromBackend)
   },
 
   getApproved: async (): Promise<PurchaseOrder[]> => {
-    const response = await httpClient.get<{data: any[], pagination: any}>(API_ENDPOINTS.PURCHASES.APPROVED)
+    const response = await httpClient.get<{ data: any[], pagination: any }>(API_ENDPOINTS.PURCHASES.APPROVED)
     return response.data.map(mapPurchaseOrderFromBackend)
   },
 }
